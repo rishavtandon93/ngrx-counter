@@ -183,3 +183,43 @@ private ondealableMutiple() {
 //     })
 //   );
 // }
+
+
+// private ondealableMutiple() {
+//   return this.evenets.onDealableMultiplePricers().pipe(
+//     mergeMap((payload: { pricerIds: string[] }) => {
+//       const pricers$ = this.pricerRepo.getPricerbyId(payload.pricerIds);
+//       return pricers$.pipe(
+//         first(),
+//         map((pricers: Pricer[]) => {
+//           return pricers.filter((pricer: Pricer) => !pricer.isLoading);
+//         }),
+//         mergeMap((pricers: Pricer[]) => {
+//           const observables: Observable<boolean>[] = [];
+
+//           // Create an array of Observables for IsMifidRequired for each pricer
+//           for (const pricer of pricers) {
+//             const isMifidRequired$ = this.IsMifidRequired(pricer.pricerId);
+//             observables.push(isMifidRequired$);
+//           }
+
+//           // Use forkJoin to wait for all IsMifidRequired Observables to complete
+//           return forkJoin(observables).pipe(
+//             map((results: boolean[]) => {
+//               // Check if all results are true
+//               const allMifidRequired = results.every((result) => result === true);
+
+//               if (allMifidRequired) {
+//                 // If all pricers require Mifid, don't send the request
+//                 return null;
+//               } else {
+//                 // If any pricer does not require Mifid, send the request
+//                 return this.dealableSpecificPricers(pricers);
+//               }
+//             })
+//           );
+//         })
+//       );
+//     })
+//   );
+// }
