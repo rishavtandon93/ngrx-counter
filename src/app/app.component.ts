@@ -24,6 +24,24 @@ export class AppComponent {
 
 }
 
+
+private ondealableMutiple() {
+  return this.evenets.onDealableMultiplePricers().pipe(
+    mergeMap((payload: {pricerIds: string[]}) => {
+      const pricers$ = this.pricerRepo.getPricerbyId(payload.pricerIds);
+      return pricers$.pipe(
+        first(), 
+        map((pricers: Pricer[]) => {
+          return pricers.filter((pricer: Pricer) => !pricer.isLoading);
+        }),
+        mergeMap((pricers: Pricer[]) => {
+          return this.dealableSpecificPricers(pricers);
+        })
+      )
+    })
+  )
+}
+
   // showModal(action: Observable<Action | unknown>) {
   //   return action.pipe(
   //     mergeMap(({ workspaceId, formId, clienRequestTime }) =>
