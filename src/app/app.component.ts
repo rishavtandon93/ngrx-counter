@@ -143,3 +143,43 @@ private ondealableMutiple() {
 //     )
 //   );
 // }
+
+// private ondealableMutiple() {
+//   return this.evenets.onDealableMultiplePricers().pipe(
+//     mergeMap((payload: {pricerIds: string[]}) => {
+//       const pricers$ = this.pricerRepo.getPricerbyId(payload.pricerIds);
+
+//       // Create an array of observables for IsMifidRequred checks
+//       const isMifidRequiredObservables: Observable<boolean>[] = payload.pricerIds.map(pricerId => {
+//         return this.IsMifidRequred(pricerId);
+//       });
+
+//       // Use forkJoin to wait for all IsMifidRequred observables to complete
+//       return forkJoin(isMifidRequiredObservables).pipe(
+//         map((results: boolean[]) => {
+//           // Check if all results are true
+//           const allTrue = results.every(result => result === true);
+//           return { allTrue, pricerIds: payload.pricerIds };
+//         }),
+//         mergeMap(({ allTrue, pricerIds }) => {
+//           if (allTrue) {
+//             // All pricerIDs have IsMifidRequred as true, send dealableSpecificPricers request
+//             const pricers$ = this.pricerRepo.getPricerbyId(pricerIds);
+//             return pricers$.pipe(
+//               first(),
+//               map((pricers: Pricer[]) => {
+//                 return pricers.filter((pricer: Pricer) => !pricer.isLoading);
+//               }),
+//               mergeMap((pricers: Pricer[]) => {
+//                 return this.dealableSpecificPricers(pricers);
+//               })
+//             );
+//           } else {
+//             // At least one pricerID has IsMifidRequred as false, do not send dealableSpecificPricers
+//             return EMPTY; // or return any other Observable as needed
+//           }
+//         })
+//       );
+//     })
+//   );
+// }
