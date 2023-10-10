@@ -24,7 +24,7 @@ export class AppComponent {
 
 }
 
-import { combineLatest } from 'rxjs';
+import { zip } from 'rxjs';
 import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 
 // private onDealableMultiple() {
@@ -41,28 +41,27 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //             )
 //           );
 
-//           return combineLatest(isMifidObservables).pipe(
+//           return zip(...isMifidObservables, (...results) => {
+//             const resultObjects = payload.pricerIds.map((pricerId, index) => ({
+//               id: pricerId,
+//               isMIfidRequired: results[index],
+//             }));
+//             return resultObjects;
+//           }).pipe(
 //             tap((results) => {
 //               // Log the results
 //               console.log('IsMifidRequired results:', results);
 //             }),
-//             map((results) => ({
-//               pricers,
-//               mifidResults: results,
-//             }))
+//             mergeMap((results) => {
+//               // Now, you can use pricers and results as needed
+//               return this.dealableSpecificPricers(pricers, results);
+//             })
 //           );
-//         }),
-//         mergeMap(({ pricers, mifidResults }) => {
-//           // Now, you can use pricers and mifidResults as needed
-//           return this.dealableSpecificPricers(pricers, mifidResults);
 //         })
 //       );
 //     })
 //   );
 // }
-
-// import { forkJoin, of } from 'rxjs';
-// import { catchError, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
@@ -83,23 +82,25 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //               // Log the results
 //               console.log('IsMifidRequired results:', results);
 //             }),
-//             map((results) => ({
-//               pricers,
-//               mifidResults: results,
-//             }))
+//             mergeMap((results) => {
+//               const resultObjects = pricers.map((pricer, index) => ({
+//                 id: pricer.pricerId,
+//                 isMIfidRequired: results[index],
+//               }));
+
+//               // Now, you can use pricers and resultObjects as needed
+//               return this.dealableSpecificPricers(pricers, resultObjects);
+//             })
 //           );
-//         }),
-//         mergeMap(({ pricers, mifidResults }) => {
-//           // Now, you can use pricers and mifidResults as needed
-//           return this.dealableSpecificPricers(pricers, mifidResults);
 //         })
 //       );
 //     })
 //   );
 // }
 
-// import { zip } from 'rxjs';
-// import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+
+// import { catchError, first, mergeMap, switchMap, tap } from 'rxjs/operators';
+// import { combineLatest, forkJoin, of } from 'rxjs';
 
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
@@ -115,31 +116,27 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //             )
 //           );
 
-//           return zip(...isMifidObservables, (...results) => {
-//             const resultObject = {};
-//             payload.pricerIds.forEach((pricerId, index) => {
-//               resultObject[pricerId] = results[index];
-//             });
-//             return resultObject;
-//           }).pipe(
+//           return combineLatest(isMifidObservables).pipe(
 //             tap((results) => {
 //               // Log the results
 //               console.log('IsMifidRequired results:', results);
 //             }),
-//             map((results) => ({
-//               pricers,
-//               mifidResults: results,
-//             }))
+//             mergeMap((results) => {
+//               const resultObjects = pricers.map((pricer, index) => ({
+//                 id: pricer.pricerId,
+//                 isMIfidRequired: results[index],
+//               }));
+
+//               // Now, you can use pricers and resultObjects as needed
+//               return this.dealableSpecificPricers(pricers, resultObjects);
+//             })
 //           );
-//         }),
-//         mergeMap(({ pricers, mifidResults }) => {
-//           // Now, you can use pricers and mifidResults as needed
-//           return this.dealableSpecificPricers(pricers, mifidResults);
 //         })
 //       );
 //     })
 //   );
 // }
+
 
 
 
