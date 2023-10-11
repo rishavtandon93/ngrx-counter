@@ -139,6 +139,40 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 
 
 
+// private onDealableMultiple() {
+//   return this.events.onDealableMultiplePricers().pipe(
+//     mergeMap((payload: { pricerIds: string[], clientRequestTime: string }) => {
+//       return this.pricerRepo.getPricerbyId(payload.pricerIds).pipe(
+//         first(),
+//         switchMap((pricers: Pricer[]) => {
+//           const isMifidObservables = pricers.map((pricer) =>
+//             this.IsMifidRequired(pricer.pricerId).pipe(
+//               catchError(() => of(undefined)) // Handle errors by setting to undefined
+//             )
+//           );
+
+//           return combineLatest(isMifidObservables).pipe(
+//             mergeMap((results) => {
+//               const resultObjects = pricers.map((pricer, index) => {
+//                 const isMIfidRequired = results[index];
+//                 const resultObject = { id: pricer.pricerId, isMIfidRequired };
+
+//                 if (isMIfidRequired) {
+//                   resultObject.clientReqeustTime = payload.clientRequestTime;
+//                 }
+
+//                 return resultObject;
+//               });
+
+//               return this.dealableSpecificPricers(resultObjects);
+//             })
+//           );
+//         })
+//       );
+//     })
+//   );
+// }
+
 
 
 
