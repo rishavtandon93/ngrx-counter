@@ -307,3 +307,68 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 
 
 
+// private onDealableMultiple() {
+//   return this.events.onDealableMultiplePricers().pipe(
+//     mergeMap((payload: { pricerIds: string[], clientRequestTime: string }) => {
+//       const pricers$ = this.pricerRepo.getPricerbyId(payload.pricerIds);
+
+//       return pricers$.pipe(
+//         first(),
+//         switchMap((pricers: Pricer[]) => {
+//           const isMifidObservables = pricers.map((pricer) =>
+//             this.IsMifidRequired(pricer.pricerId).pipe(
+//               catchError(() => of(undefined)) // Handle errors by setting to undefined
+//             )
+//           );
+
+//           return zip(...isMifidObservables, (...results) => {
+//             const resultObjects = payload.pricerIds.map((pricerId, index) => {
+//               const isMIfidRequired = results[index];
+//               const resultObject = { id: pricerId, isMIfidRequired };
+
+//               if (isMIfidRequired) {
+//                 resultObject.clientReqeustTime = payload.clientRequestTime;
+//               }
+
+//               return resultObject;
+//             });
+
+//             // Add more logic here
+//             const newLogicOutput = resultObjects.map((resultObject) => {
+//               if (
+//                 resultObject.id &&
+//                 resultObject.isMIfidRequired === true &&
+//                 resultObject.clientReqeustTime !== null &&
+//                 resultObject.clientReqeustTime !== undefined
+//               ) {
+//                 return true;
+//               } else if (resultObject.id && resultObject.isMIfidRequired === true) {
+//                 return false;
+//               } else {
+//                 return false;
+//               }
+//             });
+
+//             // Check if all elements meet the condition
+//             const allMeetCondition = newLogicOutput.every((value) => value === true);
+
+//             return { newLogicOutput, resultObjects }; // Combine both outputs into an object
+//           }).pipe(
+//             tap(({ newLogicOutput, resultObjects }) => {
+//               // Tap both newLogicOutput and resultObjects
+//               console.log('New Logic Output:', newLogicOutput);
+//               console.log('Result Objects:', resultObjects);
+//             }),
+//             mergeMap(({ newLogicOutput, resultObjects }) => {
+//               return this.dealableSpecificPricers(newLogicOutput, resultObjects);
+//             })
+//           );
+//         })
+//       );
+//     })
+//   );
+// }
+
+
+
+
