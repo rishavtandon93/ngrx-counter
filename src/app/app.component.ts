@@ -372,3 +372,84 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 
 
 
+
+
+
+
+// private onDealableM(action: Observable<Action | unkown>) {
+//   return action.pipe(
+//     mergeMap((payload: ConfirmClientRequestTimeMultiplePricersPayload) => {
+//       const pricers$ = this.pricerRepoService.getPricersById(payload.pricerIds);
+//       return pricers$.pipe(
+//         first(),
+//         switchMap((pricers: Pricer[]) => {
+//           const isMifidRequiredForPricers$ = pricers.map((pricers) => this.formOptionsRepo.isMifidRequired(pricer.id, PricerEnum.FormId));
+
+//           return zip(...isMifidRequiredForPricers$, (...results) => {
+
+//             const mappedPricersWithClientTIme = payloads.pricerIds.map((pricerId, index) => {
+//               const isMifidRequired = results[index];
+//               const mappedPricerIds = {
+//                 id: pricerId,
+//                 isMifidRequired,
+//                 clientRequestTime: payload.clientRequestTime
+//               }
+
+//               return mappedPricerIds;
+//             })
+
+//             const isMifidRequiredForAnyPricer = checkIfMifidRequiredForAnyPricer(mappedPricersWithClientTIme);
+
+//             return { isMifidRequiredForAnyPricer, mappedPricersWithClientTIme };
+//           }).pipe(
+//             tap((isMifidRequiredForAnyPricer) =>{
+//                this.mifidModalService.setIsMifidModal(isMifidRequiredForAnyPricer);
+//             }),
+//             mergeMap(({mappedPricersWithClientTIme}) => {
+//               return this.dealableSpecificPricers(mappedPricersWithClientTIme);
+//             })
+//           )
+//         })
+//       );
+//     })
+//   );
+// }
+
+
+
+// private onDealableM(action: Observable<Action | unknown>) {
+//   return action.pipe(
+//     mergeMap((payload: ConfirmClientRequestTimeMultiplePricersPayload) => {
+//       const pricers$ = this.pricerRepoService.getPricersById(payload.pricerIds);
+
+//       return pricers$.pipe(
+//         first(),
+//         switchMap((pricers: Pricer[]) => {
+//           const isMifidRequiredObservables = pricers.map((pricer) =>
+//             this.formOptionsRepo.isMifidRequired(pricer.id, PricerEnum.FormId)
+//           );
+
+//           return combineLatest(isMifidRequiredObservables).pipe(
+//             map((results: boolean[]) => {
+//               const mappedPricersWithClientTime = payload.pricerIds.map((pricerId, index) => ({
+//                 id: pricerId,
+//                 isMifidRequired: results[index],
+//                 clientRequestTime: payload.clientRequestTime,
+//               }));
+
+//               const isMifidRequiredForAnyPricer = checkIfMifidRequiredForAnyPricer(mappedPricersWithClientTime);
+
+//               return { isMifidRequiredForAnyPricer, mappedPricersWithClientTime };
+//             }),
+//             tap(({ isMifidRequiredForAnyPricer }) => {
+//               this.mifidModalService.setIsMifidModal(isMifidRequiredForAnyPricer);
+//             }),
+//             mergeMap(({ mappedPricersWithClientTime }) => {
+//               return this.dealableSpecificPricers(mappedPricersWithClientTime);
+//             })
+//           );
+//         })
+//       );
+//     })
+//   );
+// }
