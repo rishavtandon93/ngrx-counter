@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+export interface myInterface {
+  [key: string]: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -13,19 +16,61 @@ export class AppComponent {
   }
 
   example() {
-    //const val1: any = this.getValue(undefined) === undefined ? 0 : this.getValue(4);
-    const val1: any = this.getValue(undefined) || 0;
-    console.log(val1);
+    let result: myInterface[] = [{ EN: 'abc' }, { DE: 'gef' }, { ESP: 'abc' }];
+
+    let languages = ['EN', 'DE', 'ESP', 'CS'];
+
+    languages.forEach((language) => {
+      if (!result.some((obj) => obj[language] !== undefined)) {
+        result.push({ [language]: '' });
+      } else if (result.some((obj) => obj[language] === '')) {
+        result.forEach((obj) => {
+          if (obj[language] === '') {
+            obj[language] = 'newValue'; // Replace 'newValue' with the desired value
+          }
+        });
+      }
+    });
+
+    console.log(result);
+
+    languages.push('FR');
+
+    languages.forEach((language) => {
+      if (!result.some((obj) => obj[language] !== undefined)) {
+        result.push({ [language]: '' });
+      } else if (result.some((obj) => obj[language] === '')) {
+        result.forEach((obj) => {
+          if (obj[language] === '') {
+            obj[language] = ''; // Replace 'newValue' with the desired value
+          }
+        });
+      }
+    });
+
+    console.log(result);
   }
+
+  // example() {
+  //   //const val1: any = this.getValue(undefined) === undefined ? 0 : this.getValue(4);
+  //   const val1: any = this.getValue(undefined) || 0;
+  //   console.log(val1);
+  // }
 
   getValue(value: any) {
     return value;
   }
-
 }
 
 import { zip } from 'rxjs';
-import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import {
+  catchError,
+  first,
+  map,
+  mergeMap,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
@@ -98,7 +143,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //   );
 // }
 
-
 // import { catchError, first, mergeMap, switchMap, tap } from 'rxjs/operators';
 // import { combineLatest, forkJoin, of } from 'rxjs';
 
@@ -137,8 +181,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //   );
 // }
 
-
-
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
 //     mergeMap((payload: { pricerIds: string[], clientRequestTime: string }) => {
@@ -172,7 +214,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //     })
 //   );
 // }
-
 
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
@@ -217,7 +258,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //   );
 // }
 
-
 // private dealableSpecificPricers(pricers: Pricer[], resultObjects: ResultObject[]) {
 //   return merge(
 //     pricers.map((pricer, index) => {
@@ -242,7 +282,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //     })
 //   );
 // }
-
 
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
@@ -303,9 +342,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //     })
 //   );
 // }
-
-
-
 
 // private onDealableMultiple() {
 //   return this.events.onDealableMultiplePricers().pipe(
@@ -369,13 +405,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //   );
 // }
 
-
-
-
-
-
-
-
 // private onDealableM(action: Observable<Action | unkown>) {
 //   return action.pipe(
 //     mergeMap((payload: ConfirmClientRequestTimeMultiplePricersPayload) => {
@@ -414,8 +443,6 @@ import { catchError, first, map, mergeMap, switchMap, tap } from 'rxjs/operators
 //     })
 //   );
 // }
-
-
 
 // private onDealableM(action: Observable<Action | unknown>) {
 //   return action.pipe(
