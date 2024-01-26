@@ -1,6 +1,12 @@
-import { Component } from '@angular/core';
-export interface myInterface {
-  [key: string]: string;
+import { Component, OnInit } from '@angular/core';
+import { combineLatest, distinctUntilChanged, withLatestFrom } from 'rxjs';
+export interface LanguageSpecficProductNameValues {
+  [language: string]: string;
+}
+
+export interface LanguageSpecficProductNamePayload {
+  defaultLanguage: string;
+  languageSpecficProductName: LanguageSpecficProductNameValues[];
 }
 
 @Component({
@@ -8,15 +14,21 @@ export interface myInterface {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'NgRx_Counter';
 
   constructor() {
     this.example();
   }
 
+  ngOnInit(): void {}
+
   example() {
-    let result: myInterface[] = [{ EN: 'abc' }, { DE: 'gef' }, { ESP: 'abc' }];
+    let result: LanguageSpecficProductNameValues[] = [
+      { EN: 'abc' },
+      { DE: 'gef' },
+      { ESP: 'abc' },
+    ];
 
     let languages = ['EN', 'DE', 'ESP', 'CS'];
 
@@ -61,11 +73,14 @@ export class AppComponent {
     return value;
   }
 
-  updateResultArray(result: { [key: string]: string }[], languages: string[]): void {
+  updateResultArray(
+    result: { [key: string]: string }[],
+    languages: string[]
+  ): void {
     // Remove languages that exist in languages array but not in result array
     languages
-      .filter(language => !result.some(obj => obj.hasOwnProperty(language)))
-      .forEach(languageToRemove => {
+      .filter((language) => !result.some((obj) => obj.hasOwnProperty(language)))
+      .forEach((languageToRemove) => {
         const indexToRemove = languages.indexOf(languageToRemove);
         if (indexToRemove !== -1) {
           languages.splice(indexToRemove, 1);
@@ -73,11 +88,11 @@ export class AppComponent {
       });
 
     // Add new objects for missing languages in result array
-    languages.forEach(language => {
-      if (!result.some(obj => obj[language] !== undefined)) {
+    languages.forEach((language) => {
+      if (!result.some((obj) => obj[language] !== undefined)) {
         result.push({ [language]: '' });
-      } else if (result.some(obj => obj[language] === '')) {
-        result.forEach(obj => {
+      } else if (result.some((obj) => obj[language] === '')) {
+        result.forEach((obj) => {
           if (obj[language] === '') {
             obj[language] = 'newValue'; // Replace 'newValue' with the desired value
           }
@@ -85,5 +100,27 @@ export class AppComponent {
       }
     });
   }
-}
 
+  addLanguageToProductName(
+    selectLanguages: string[],
+    selectedLanguageWithProductName: LanguageSpecficProductNameValues[],
+    defaultProductName: string
+  ): LanguageSpecficProductNameValues[] {
+    return [
+      ...selectedLanguageWithProductName,
+      ...selectLanguages
+        .filter(language => !selectedLanguageWithProductName.some(obj => obj[language] !== undefined))
+        .map(language => ({ [language]: defaultProductName }))
+    ];
+  }
+
+  // const selectLanguages = ['FR', 'DE', 'CS'];
+  // const selectedLanguageWithProductName = [
+  //   { EN: 'abc' },
+  //   { DE: 'gef' },
+  // ];
+  // const defaultProductName = 'abc';
+
+  // const result = addLanguageToProductName(selectLanguages, selectedLanguageWithProductName, defaultProductName);
+  // console.log(result);
+}
