@@ -123,4 +123,17 @@ export class AppComponent implements OnInit {
 
   // const result = addLanguageToProductName(selectLanguages, selectedLanguageWithProductName, defaultProductName);
   // console.log(result);
+
+  // function stringifyLanguageSpecficProductName(payload: LanguageSpecficProductNamePayload): string {
+  //   const { defaultLanguage, languageSpecficProductName } = payload;
+
+  //   // Map each language-product name pair to a string in the format "language: productName"
+  //   const pairs = languageSpecficProductName.map(obj => {
+  //     const [language, productName] = Object.entries(obj)[0];
+  //     return `${language}: ${productName}`;
+  //   });
+
+  //   // Join the pairs with commas and prepend the default language followed by a pipe character
+  //   return `${defaultLanguage} | ${pairs.join(', ')}`;
+  // }
 }
