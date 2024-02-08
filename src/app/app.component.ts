@@ -150,11 +150,15 @@ export class AppComponent implements OnInit {
     return transformRows(this.header, this.rows);
   }
 
-  export function transformRows(header: string[], rows: string[][]): { [key: string]: string }[] {
+  function transformRows(header: string[], rows: (string | { text: string, color: string })[][]): { [key: string]: string }[] {
     return rows.map(row => {
       let transformedRow: { [key: string]: string } = {};
       header.forEach((key, index) => {
-        transformedRow[key] = row[index];
+        if (typeof row[index] === 'object') {
+          transformedRow[key] = (row[index] as { text: string, color?: string }).text;
+        } else {
+          transformedRow[key] = row[index] as string;
+        }
       });
       return transformedRow;
     });
