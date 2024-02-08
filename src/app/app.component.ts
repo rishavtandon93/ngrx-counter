@@ -136,4 +136,27 @@ export class AppComponent implements OnInit {
   //   // Join the pairs with commas and prepend the default language followed by a pipe character
   //   return `${defaultLanguage} | ${pairs.join(', ')}`;
   // }
+
+  gridOptions: GridOptions = {
+    columnDefs: this.getColumnDefs(),
+    rowData: this.getTransformedRows()
+  };
+
+  getColumnDefs() {
+    return this.header.map(colName => ({ headerName: colName, field: colName }));
+  }
+
+  getTransformedRows() {
+    return transformRows(this.header, this.rows);
+  }
+
+  export function transformRows(header: string[], rows: string[][]): { [key: string]: string }[] {
+    return rows.map(row => {
+      let transformedRow: { [key: string]: string } = {};
+      header.forEach((key, index) => {
+        transformedRow[key] = row[index];
+      });
+      return transformedRow;
+    });
+  }
 }
