@@ -200,30 +200,35 @@ export class GridExampleComponent {
   }
 }
 
+import { Component } from '@angular/core';
+import { ICellRendererAngularComp } from 'ag-grid-angular';
+
 @Component({
   selector: 'app-custom-renderer',
-  template: `<div [style.color]="getTextColor(params.value)">
-                {{ getText(params.value) }}
-             </div>`
+  template: `<span [style.color]="getTextColor()" [innerHTML]="getText()"></span>`
 })
-export class CustomRendererComponent {
-  params: any;
+export class CustomRendererComponent implements ICellRendererAngularComp {
+  value: any;
 
   agInit(params: any): void {
-    this.params = params;
+    this.value = params.value;
   }
 
-  getTextColor(value: any): string {
-    if (typeof value === 'object' && value.color) {
-      return value.color;
+  getTextColor(): string {
+    if (typeof this.value === 'object' && this.value.color) {
+      return this.value.color;
     }
-    return 'black'; // default color
+    return 'black'; // Default color
   }
 
-  getText(value: any): string {
-    if (typeof value === 'object' && value.text) {
-      return value.text;
+  getText(): string {
+    if (typeof this.value === 'object' && this.value.text) {
+      return this.value.text;
     }
-    return value;
+    return this.value;
+  }
+
+  refresh(): boolean {
+    return false;
   }
 }
