@@ -210,3 +210,10 @@ export class GridExampleComponent {
   class="ag-theme-alpine"
   [gridOptions]="gridOptions">
 </ag-grid-angular>
+
+const transformedRows = rows.map(row => {
+  return row.map((value, index) => {
+      const columnName = header[index];
+      return { [columnName]: value };
+  });
+});
