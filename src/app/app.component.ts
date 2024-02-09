@@ -165,9 +165,8 @@ export class AppComponent implements OnInit {
   }
 }
 
-
-
-
+escript
+Copy code
 import { Component } from '@angular/core';
 import { GridOptions } from 'ag-grid-community';
 
@@ -180,7 +179,7 @@ export class GridExampleComponent {
   header = ['filter', 'request', 'used', 'matched style'];
   rows = [
     ['Underlying', 'Apple', 'All stocks', 'Direct Match'],
-    ['Tenor', '12M', 'Autocall, {text: indirect match, color:yellow}'],
+    ['Tenor', '12M', 'Autocall', { text: 'indirect match', color: 'yellow' }],
     ['Product', 'AutoCall', 'Autocall abc', 'Direct Match']
   ];
 
@@ -188,7 +187,7 @@ export class GridExampleComponent {
     columnDefs: this.getColumnDefs(),
     rowData: this.rows,
     frameworkComponents: {
-      customRenderer: this.cellRenderer.bind(this)
+      customRenderer: CustomRendererComponent
     }
   };
 
@@ -199,13 +198,31 @@ export class GridExampleComponent {
       cellRenderer: 'customRenderer'
     }));
   }
+}
 
-  cellRenderer(params: any) {
-    const value = params.value;
-    if (typeof value === 'object') {
-      const text = value.text;
-      const color = value.color || 'black'; // Default to black if color is not specified
-      return `<span style="color: ${color};">${text}</span>`;
+@Component({
+  selector: 'app-custom-renderer',
+  template: `<div [style.color]="getTextColor(params.value)">
+                {{ getText(params.value) }}
+             </div>`
+})
+export class CustomRendererComponent {
+  params: any;
+
+  agInit(params: any): void {
+    this.params = params;
+  }
+
+  getTextColor(value: any): string {
+    if (typeof value === 'object' && value.color) {
+      return value.color;
+    }
+    return 'black'; // default color
+  }
+
+  getText(value: any): string {
+    if (typeof value === 'object' && value.text) {
+      return value.text;
     }
     return value;
   }
