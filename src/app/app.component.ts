@@ -137,38 +137,43 @@ export class AppComponent implements OnInit {
   //   return `${defaultLanguage} | ${pairs.join(', ')}`;
   // }
 
-  gridOptions: GridOptions = {
-    columnDefs: this.getColumnDefs(),
-    rowData: this.getTransformedRows()
-  };
+  import { Component } from '@angular/core';
+  import { ICellRendererAngularComp } from 'ag-grid-angular';
 
-  getColumnDefs() {
-    return this.header.map(colName => ({ headerName: colName, field: colName }));
+  @Component({
+    selector: 'app-custom-renderer',
+    template: `<span [style.color]="getTextColor()" [innerHTML]="getText()"></span>`
+  })
+  export class CustomRendererComponent implements ICellRendererAngularComp {
+    value: any;
+
+    agInit(params: any): void {
+      this.value = params.value;
+    }
+
+    getTextColor(): string {
+      if (typeof this.value === 'object' && this.value.color) {
+        return this.value.color;
+      }
+      return 'black'; // Default color
+    }
+
+    getText(): string {
+      if (typeof this.value === 'object' && this.value.text) {
+        return this.value.text;
+      }
+      return this.value;
+    }
+
+    refresh(): boolean {
+      return false;
+    }
   }
 
-  getTransformedRows() {
-    return transformRows(this.header, this.rows);
-  }
 
-  function transformRows(header: string[], rows: (string | { text: string, color: string })[][]): { [key: string]: string }[] {
-    return rows.map(row => {
-      let transformedRow: { [key: string]: string } = {};
-      header.forEach((key, index) => {
-        if (typeof row[index] === 'object') {
-          transformedRow[key] = (row[index] as { text: string, color?: string }).text;
-        } else {
-          transformedRow[key] = row[index] as string;
-        }
-      });
-      return transformedRow;
-    });
-  }
-}
-
-escript
-Copy code
-import { Component } from '@angular/core';
+  import { Component } from '@angular/core';
 import { GridOptions } from 'ag-grid-community';
+import { CustomRendererComponent } from './custom-renderer.component'; // Adjust the path as needed
 
 @Component({
   selector: 'app-grid-example',
@@ -195,40 +200,13 @@ export class GridExampleComponent {
     return this.header.map(colName => ({
       headerName: colName,
       field: colName,
-      cellRenderer: 'customRenderer'
+      cellRenderer: 'customRenderer' // Use the name specified in frameworkComponents
     }));
   }
 }
 
-import { Component } from '@angular/core';
-import { ICellRendererAngularComp } from 'ag-grid-angular';
-
-@Component({
-  selector: 'app-custom-renderer',
-  template: `<span [style.color]="getTextColor()" [innerHTML]="getText()"></span>`
-})
-export class CustomRendererComponent implements ICellRendererAngularComp {
-  value: any;
-
-  agInit(params: any): void {
-    this.value = params.value;
-  }
-
-  getTextColor(): string {
-    if (typeof this.value === 'object' && this.value.color) {
-      return this.value.color;
-    }
-    return 'black'; // Default color
-  }
-
-  getText(): string {
-    if (typeof this.value === 'object' && this.value.text) {
-      return this.value.text;
-    }
-    return this.value;
-  }
-
-  refresh(): boolean {
-    return false;
-  }
-}
+<ag-grid-angular
+  style="width: 100%; height: 500px;"
+  class="ag-theme-alpine"
+  [gridOptions]="gridOptions">
+</ag-grid-angular>
