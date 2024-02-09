@@ -164,3 +164,49 @@ export class AppComponent implements OnInit {
     });
   }
 }
+
+
+
+
+import { Component } from '@angular/core';
+import { GridOptions } from 'ag-grid-community';
+
+@Component({
+  selector: 'app-grid-example',
+  templateUrl: './grid-example.component.html',
+  styleUrls: ['./grid-example.component.css']
+})
+export class GridExampleComponent {
+  header = ['filter', 'request', 'used', 'matched style'];
+  rows = [
+    ['Underlying', 'Apple', 'All stocks', 'Direct Match'],
+    ['Tenor', '12M', 'Autocall, {text: indirect match, color:yellow}'],
+    ['Product', 'AutoCall', 'Autocall abc', 'Direct Match']
+  ];
+
+  gridOptions: GridOptions = {
+    columnDefs: this.getColumnDefs(),
+    rowData: this.rows,
+    frameworkComponents: {
+      customRenderer: this.cellRenderer.bind(this)
+    }
+  };
+
+  getColumnDefs() {
+    return this.header.map(colName => ({
+      headerName: colName,
+      field: colName,
+      cellRenderer: 'customRenderer'
+    }));
+  }
+
+  cellRenderer(params: any) {
+    const value = params.value;
+    if (typeof value === 'object') {
+      const text = value.text;
+      const color = value.color || 'black'; // Default to black if color is not specified
+      return `<span style="color: ${color};">${text}</span>`;
+    }
+    return value;
+  }
+}
