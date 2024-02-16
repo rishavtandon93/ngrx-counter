@@ -171,49 +171,12 @@ export class AppComponent implements OnInit {
   }
 
 
-  import { Component } from '@angular/core';
-import { GridOptions } from 'ag-grid-community';
-import { CustomRendererComponent } from './custom-renderer.component'; // Adjust the path as needed
+  function removeLogLevelFromString(str) {
+    // Define the regular expression pattern
+    const pattern = /\[(Fatal|Warn)\]:\s*/;
 
-@Component({
-  selector: 'app-grid-example',
-  templateUrl: './grid-example.component.html',
-  styleUrls: ['./grid-example.component.css']
-})
-export class GridExampleComponent {
-  header = ['filter', 'request', 'used', 'matched style'];
-  rows = [
-    ['Underlying', 'Apple', 'All stocks', 'Direct Match'],
-    ['Tenor', '12M', 'Autocall', { text: 'indirect match', color: 'yellow' }],
-    ['Product', 'AutoCall', 'Autocall abc', 'Direct Match']
-  ];
+    // Use the replace method with the regular expression to remove the pattern
+    const newStr = str.replace(pattern, '');
 
-  gridOptions: GridOptions = {
-    columnDefs: this.getColumnDefs(),
-    rowData: this.rows,
-    frameworkComponents: {
-      customRenderer: CustomRendererComponent
-    }
-  };
-
-  getColumnDefs() {
-    return this.header.map(colName => ({
-      headerName: colName,
-      field: colName,
-      cellRenderer: 'customRenderer' // Use the name specified in frameworkComponents
-    }));
-  }
+    return newStr;
 }
-
-<ag-grid-angular
-  style="width: 100%; height: 500px;"
-  class="ag-theme-alpine"
-  [gridOptions]="gridOptions">
-</ag-grid-angular>
-
-const transformedRows = rows.map(row => {
-  return row.map((value, index) => {
-      const columnName = header[index];
-      return { [columnName]: value };
-  });
-});
