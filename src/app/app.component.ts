@@ -180,3 +180,21 @@ export class AppComponent implements OnInit {
 
     return newStr;
 }
+
+
+array.forEach(obj => {
+  if (obj.field === 'value') {
+      obj.cellClass = 'color-red';
+      obj.valueGetter = (params: ICellRendererParams) => {
+          const value = params.data[obj.field];
+          if (typeof value === 'object' && value.text) {
+              return value.text;
+          }
+          return value;
+      };
+      obj.valueSetter = (params: ICellRendererParams) => {
+          params.data[obj.field] = params.newValue;
+          return true;
+      };
+  }
+});
