@@ -181,20 +181,35 @@ export class AppComponent implements OnInit {
     return newStr;
 }
 
+const convertDateTime = (date: string, styleClass: string) => {
+  const timeZonesToDisplay = availableTimeZones;
 
-array.forEach(obj => {
-  if (obj.field === 'value') {
-      obj.cellClass = 'color-red';
-      obj.valueGetter = (params: ICellRendererParams) => {
-          const value = params.data[obj.field];
-          if (typeof value === 'object' && value.text) {
-              return value.text;
-          }
-          return value;
-      };
-      obj.valueSetter = (params: ICellRendererParams) => {
-          params.data[obj.field] = params.newValue;
-          return true;
-      };
-  }
-});
+  const formattedISO = date.replace(' ', 'T');
+  const dt = DateTime.fromISO(formattedISO, {setZone: true});
+
+  const datePart = dt.toFormat('yyyy-MM-dd');
+  const timePart = dt.toFormat('HH:mm:ss');
+  const offset = dt.toFormat('ZZ');
+
+  const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
+
+  return `${datePart} <span class="${styleClass}"> ${timePart} </span> ${timezone.length ? timezone[0].abbreviation : `UTC ${offset}`} `;
+}
+
+
+const convertDateTime = (date, styleClass) => {
+  const timeZonesToDisplay = availableTimeZones;
+
+  const formattedISO = date.replace(' ', 'T');
+  const dt = DateTime.fromISO(formattedISO, { setZone: true });
+
+  const datePart = dt.toFormat('yyyy-MM-dd');
+  const timePart = dt.toFormat('HH:mm:ss');
+  const offset = dt.toFormat('ZZ');
+
+  const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
+
+  const spanTag = styleClass ? `<span class="${styleClass}">${timePart}</span>` : timePart;
+
+  return `${datePart} ${spanTag} ${timezone.length ? timezone[0].abbreviation : `UTC ${offset}`}`;
+};
