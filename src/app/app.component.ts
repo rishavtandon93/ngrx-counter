@@ -181,35 +181,30 @@ export class AppComponent implements OnInit {
     return newStr;
 }
 
-const convertDateTime = (date: string, styleClass: string) => {
+const getTimezonePart = (dt: DateTime): string => {
   const timeZonesToDisplay = availableTimeZones;
-
-  const formattedISO = date.replace(' ', 'T');
-  const dt = DateTime.fromISO(formattedISO, {setZone: true});
-
-  const datePart = dt.toFormat('yyyy-MM-dd');
-  const timePart = dt.toFormat('HH:mm:ss');
   const offset = dt.toFormat('ZZ');
-
   const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
+  return timezone.length ? timezone[0].abbreviation : `UTC ${offset}`;
+};
 
-  return `${datePart} <span class="${styleClass}"> ${timePart} </span> ${timezone.length ? timezone[0].abbreviation : `UTC ${offset}`} `;
-}
+const getTimePartWithStyle = (timePart: string, styleClass: string): string => {
+  return `<span class="${styleClass}">${timePart}</span>`;
+};
 
+const getTimePartWithoutStyle = (timePart: string): string => {
+  return timePart;
+};
 
-const convertDateTime = (date, styleClass) => {
-  const timeZonesToDisplay = availableTimeZones;
-
+const convertDateTime = (date: string, styleClass?: string): string => {
   const formattedISO = date.replace(' ', 'T');
   const dt = DateTime.fromISO(formattedISO, { setZone: true });
 
   const datePart = dt.toFormat('yyyy-MM-dd');
   const timePart = dt.toFormat('HH:mm:ss');
-  const offset = dt.toFormat('ZZ');
 
-  const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
+  const timezonePart = getTimezonePart(dt);
+  const timePartWithStyle = styleClass ? getTimePartWithStyle(timePart, styleClass) : getTimePartWithoutStyle(timePart);
 
-  const spanTag = styleClass ? `<span class="${styleClass}">${timePart}</span>` : timePart;
-
-  return `${datePart} ${spanTag} ${timezone.length ? timezone[0].abbreviation : `UTC ${offset}`}`;
+  return `${datePart} ${timePartWithStyle} ${timezonePart}`;
 };
