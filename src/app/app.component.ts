@@ -208,3 +208,30 @@ const convertDateTime = (date: string, styleClass?: string): string => {
 
   return `${datePart} ${timePartWithStyle} ${timezonePart}`;
 };
+
+
+interface DateTimeInfo {
+  datePart: string;
+  timePart: string;
+  timeZonePart: string;
+}
+
+const convertDateTime = (date: string): DateTimeInfo => {
+  const timeZonesToDisplay = availableTimeZones;
+
+  const formattedISO = date.replace(' ', 'T');
+  const dt = DateTime.fromISO(formattedISO, { setZone: true });
+
+  const datePart = dt.toFormat('yyyy-MM-dd');
+  const timePart = dt.toFormat('HH:mm:ss');
+  const offset = dt.toFormat('ZZ');
+
+  const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
+  const timeZonePart = timezone.length ? timezone[0].abbreviation : `UTC ${offset}`;
+
+  return {
+    datePart: datePart,
+    timePart: timePart,
+    timeZonePart: timeZonePart
+  };
+};
