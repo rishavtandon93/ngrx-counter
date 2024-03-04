@@ -245,3 +245,14 @@ getFetchStatus(): Observable<boolean> {
     map((status: boolean) => of(status))
   );
 }
+
+combineFetchStatusAndMetaData(): Observable<boolean> {
+  return combineLatest([
+    this.getIsLoadingMetaData(),
+    this.getFetchStatus()
+  ]).pipe(
+    map(([metaDataLoading, fetchStatus]) => {
+      return metaDataLoading || fetchStatus;
+    })
+  );
+}
