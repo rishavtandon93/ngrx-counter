@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, distinctUntilChanged, withLatestFrom } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, withLatestFrom } from 'rxjs';
 export interface LanguageSpecficProductNameValues {
   [language: string]: string;
 }
@@ -235,3 +235,13 @@ const convertDateTime = (date: string): DateTimeInfo => {
     timeZonePart: timeZonePart
   };
 };
+
+
+getFetchStatus(): Observable<boolean> {
+  return this.blotterService.loadingStatus$.pipe(
+    map((loadingStatus: LoadingStatus | null) => {
+      return loadingStatus ? boltterUtils.isFetchInProgress(loadingStatus.completeStatus) : false;
+    }),
+    map((status: boolean) => of(status))
+  );
+}
