@@ -263,3 +263,18 @@ combineFetchStatusAndMetaData(): Observable<boolean> {
     map(([metaDataLoading, fetchStatus, blotterValidity]) => metaDataLoading || fetchStatus || blotterValidity)
   );
 }
+
+combineStreams(): Observable<{
+  isQuickFetchDisabled: boolean;
+  tooltipMessage: string;
+}> {
+  return combineLatest([
+    this.combineFetchStatusAndMetaData(),
+    this.blotterService.getFilterValidity()
+  ]).pipe(
+    map(([fetchStatus, filterValidity]) => ({
+      isQuickFetchDisabled: fetchStatus || filterValidity,
+      tooltipMessage: fetchStatus ? 'Quick fetch in progress' : 'Filters invalid'
+    }))
+  );
+}
