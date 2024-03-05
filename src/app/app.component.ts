@@ -256,3 +256,10 @@ combineFetchStatusAndMetaData(): Observable<boolean> {
     })
   );
 }
+
+combineFetchStatusAndMetaData(): Observable<boolean> {
+  return this.getIsLoadingMetaData().pipe(
+    withLatestFrom(this.getFetchStatus(), this.blotterService.getBlotterFilterValidity()),
+    map(([metaDataLoading, fetchStatus, blotterValidity]) => metaDataLoading || fetchStatus || blotterValidity)
+  );
+}
