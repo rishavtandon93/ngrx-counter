@@ -278,3 +278,7 @@ combineStreams(): Observable<{
     }))
   );
 }
+
+removeSpanTags(inputString: string): string {
+  return inputString.replace(/<span class="highlight-time">(.*?)<\/span>/g, '$1');
+}
