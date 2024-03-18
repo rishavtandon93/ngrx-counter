@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, distinctUntilChanged, map, withLatestFrom } from 'rxjs';
+import { Observable, combineLatest, distinctUntilChanged, map, withLatestFrom } from 'rxjs';
 export interface LanguageSpecficProductNameValues {
   [language: string]: string;
 }
@@ -281,4 +281,16 @@ combineStreams(): Observable<{
 
 removeSpanTags(inputString: string): string {
   return inputString.replace(/<span class="highlight-time">(.*?)<\/span>/g, '$1');
+}
+
+buildUrl(): Observable<string> {
+  return combineLatest([
+    this.appConfigService.getInsightHost(),
+    this.authService.getUSerDetails(),
+    this.rebuildWSUrl$
+  ]).pipe(
+    map(([insightHost, userDeatisl]) => {
+      return `${insightUrls.blotterService(insightHost)}?user${userDeatisl.id}`;
+    })
+  );
 }
