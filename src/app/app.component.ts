@@ -258,3 +258,10 @@ getInitialTemplate(quoteIds: string[]): Observable<string> {
     )
   );
 }
+
+<ng-template pTemplate="header">
+    <div class="custom-header">
+      <span>Email Templates</span>
+      <button class="custom-button" (click)="customButtonClicked()">Custom Button</button>
+    </div>
+  </ng-template>
