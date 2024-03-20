@@ -181,6 +181,17 @@ export class AppComponent implements OnInit {
     return newStr;
 }
 
+function getInitialTemplate(quoteIds: string[]): void {
+  this.apiConfigService.getInsightHost().pipe(
+    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
+    switchMap((url: string) =>
+      this.http.post<any>(url, data)
+    )
+  ).susbcribe((response: any) => {
+    this.inititalTemplate = response.body
+  })
+}
+
 const getTimezonePart = (dt: DateTime): string => {
   const timeZonesToDisplay = availableTimeZones;
   const offset = dt.toFormat('ZZ');
@@ -237,60 +248,13 @@ const convertDateTime = (date: string): DateTimeInfo => {
 };
 
 
-getFetchStatus(): Observable<boolean> {
-  return this.blotterService.loadingStatus$.pipe(
-    map((loadingStatus: LoadingStatus | null) => {
-      return loadingStatus ? boltterUtils.isFetchInProgress(loadingStatus.completeStatus) : false;
-    }),
-    map((status: boolean) => of(status))
-  );
-}
-
-combineFetchStatusAndMetaData(): Observable<boolean> {
-  return combineLatest([
-    this.getIsLoadingMetaData(),
-    this.getFetchStatus()
-  ]).pipe(
-    map(([metaDataLoading, fetchStatus]) => {
-      return metaDataLoading || fetchStatus;
-    })
-  );
-}
-
-combineFetchStatusAndMetaData(): Observable<boolean> {
-  return this.getIsLoadingMetaData().pipe(
-    withLatestFrom(this.getFetchStatus(), this.blotterService.getBlotterFilterValidity()),
-    map(([metaDataLoading, fetchStatus, blotterValidity]) => metaDataLoading || fetchStatus || blotterValidity)
-  );
-}
-
-combineStreams(): Observable<{
-  isQuickFetchDisabled: boolean;
-  tooltipMessage: string;
-}> {
-  return combineLatest([
-    this.combineFetchStatusAndMetaData(),
-    this.blotterService.getFilterValidity()
-  ]).pipe(
-    map(([fetchStatus, filterValidity]) => ({
-      isQuickFetchDisabled: fetchStatus || filterValidity,
-      tooltipMessage: fetchStatus ? 'Quick fetch in progress' : 'Filters invalid'
-    }))
-  );
-}
-
-removeSpanTags(inputString: string): string {
-  return inputString.replace(/<span class="highlight-time">(.*?)<\/span>/g, '$1');
-}
-
-buildUrl(): Observable<string> {
-  return combineLatest([
-    this.appConfigService.getInsightHost(),
-    this.authService.getUSerDetails(),
-    this.rebuildWSUrl$
-  ]).pipe(
-    map(([insightHost, userDeatisl]) => {
-      return `${insightUrls.blotterService(insightHost)}?user${userDeatisl.id}`;
-    })
+getInitialTemplate(quoteIds: string[]): Observable<string> {
+  return this.apiConfigService.getInsightHost().pipe(
+    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
+    switchMap((url: string) =>
+      this.http.post<any>(url, data).pipe(
+        map(response => response.body)
+      )
+    )
   );
 }
