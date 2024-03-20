@@ -265,3 +265,22 @@ getInitialTemplate(quoteIds: string[]): Observable<string> {
       <button class="custom-button" (click)="customButtonClicked()">Custom Button</button>
     </div>
   </ng-template>
+
+  .custom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .custom-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .custom-button:hover {
+    background-color: #0056b3;
+  }
