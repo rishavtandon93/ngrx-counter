@@ -259,28 +259,36 @@ getInitialTemplate(quoteIds: string[]): Observable<string> {
   );
 }
 
-<ng-template pTemplate="header">
-    <div class="custom-header">
-      <span>Email Templates</span>
-      <button class="custom-button" (click)="customButtonClicked()">Custom Button</button>
-    </div>
-  </ng-template>
+downloadEmail() {
+  this.blotterService.getQuoteIds().pipe(
+    mergeMap(ids => this.activeState.pipe(
+      // Use mergeMap to merge the emissions of getQuoteIds() with activeState
+      map(gridstate => ({ ids, gridstate })) // Combine ids and gridstate into an object
+    ))
+  ).subscribe(({ ids, gridstate }) => {
+    // Destructure ids and gridstate from the emitted object
+    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
+  });
+}
 
-  .custom-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+import { switchMap } from 'rxjs/operators';
 
-  .custom-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+downloadEmail() {
+  this.blotterService.getQuoteIds().pipe(
+    switchMap(ids => this.activeState.pipe(
+      map(gridstate => ({ ids, gridstate })) // Combine ids and gridstate into an object
+    ))
+  ).subscribe(({ ids, gridstate }) => {
+    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
+  });
+}
 
-  .custom-button:hover {
-    background-color: #0056b3;
-  }
+import { mergeMap } from 'rxjs/operators';
+
+downloadEmail() {
+  this.blotterService.getQuoteIds().pipe(
+    mergeMap(ids => this.activeState.pipe(
+      map(gridstate => this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate))
+    ))
+  ).subscribe();
+}
