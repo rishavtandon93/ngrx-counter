@@ -301,3 +301,14 @@ downloadEmail() {
     this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
   });
 }
+
+downloadEmail() {
+  this.activeState.pipe(
+    startWith(null), // Trigger initial emission
+    switchMap(gridstate => this.blotterService.getQuoteIds().pipe(
+      map(ids => ({ ids, gridstate }))
+    ))
+  ).subscribe(({ ids, gridstate }) => {
+    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
+  });
+}
