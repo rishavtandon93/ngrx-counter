@@ -292,3 +292,12 @@ downloadEmail() {
     ))
   ).subscribe();
 }
+
+downloadEmail() {
+  combineLatest([
+    this.blotterService.getQuoteIds(),
+    this.activeState
+  ]).subscribe(([ids, gridstate]) => {
+    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
+  });
+}
