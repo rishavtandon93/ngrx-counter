@@ -312,3 +312,13 @@ downloadEmail() {
     this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
   });
 }
+
+downloadEmail() {
+  this.activeState.pipe(
+    startWith(null),
+    withLatestFrom(this.formControl.valueChanges.pipe(startWith(null))),
+    withLatestFrom(this.blotterService.getQuoteIds())
+  ).subscribe(([[gridstate, formValue], ids]) => {
+    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate, formValue);
+  });
+}
