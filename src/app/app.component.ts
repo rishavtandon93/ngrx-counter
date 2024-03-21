@@ -332,3 +332,12 @@ downloadEmail() {
     this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
   });
 }
+
+downloadEmail() {
+  return this.blotterService.getQuoteIds().pipe(
+    withLatestFrom(this.activeState), // Combine emissions with latest value from activeState
+    switchMap(([ids, gridstate]) =>
+      this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate)
+    )
+  );
+}
