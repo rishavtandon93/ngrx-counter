@@ -357,3 +357,13 @@ getInitialTemplate(quoteIds: string[]): Observable<string[]> {
     )
   );
 }
+
+getInitialTemplate(quoteIds: string[]): Observable<string[]> {
+  return this.apiConfigService.getInsightHost().pipe(
+    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
+    switchMap((url: string) =>
+      this.http.post<string[]>(url, data)
+    ),
+    map(response => response.body) // Extract the body property
+  );
+}
