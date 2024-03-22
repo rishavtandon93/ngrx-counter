@@ -341,3 +341,19 @@ downloadEmail() {
     )
   );
 }
+
+getInitialTemplate(quoteIds: string[]): Observable<string[]> {
+  return this.apiConfigService.getInsightHost().pipe(
+    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
+    switchMap((url: string) =>
+      this.http.post<string[]>(url, data).pipe(
+        tap(response => {
+          if (response && response.length > 0) {
+            // Set the initial value of the form control
+            this.yourFormControl.setValue(response[0]);
+          }
+        })
+      )
+    )
+  );
+}
