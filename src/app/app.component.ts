@@ -248,134 +248,40 @@ const convertDateTime = (date: string): DateTimeInfo => {
 };
 
 
-getInitialTemplate(quoteIds: string[]): Observable<string> {
-  return this.apiConfigService.getInsightHost().pipe(
-    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
-    switchMap((url: string) =>
-      this.http.post<any>(url, data).pipe(
-        map(response => response.body)
-      )
-    )
-  );
-}
+import { Component } from '@angular/core';
+import { Clipboard } from '@angular/cdk/clipboard';
 
-downloadEmail() {
-  this.blotterService.getQuoteIds().pipe(
-    mergeMap(ids => this.activeState.pipe(
-      // Use mergeMap to merge the emissions of getQuoteIds() with activeState
-      map(gridstate => ({ ids, gridstate })) // Combine ids and gridstate into an object
-    ))
-  ).subscribe(({ ids, gridstate }) => {
-    // Destructure ids and gridstate from the emitted object
-    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
-  });
-}
+@Component({
+  selector: 'app-clipboard-example',
+  templateUrl: './clipboard-example.component.html',
+  styleUrls: ['./clipboard-example.component.css']
+})
+export class ClipboardExampleComponent {
 
-import { switchMap } from 'rxjs/operators';
+  originalText = "Original Text";
+  boldText = `<b>${this.originalText}</b>`;
 
-downloadEmail() {
-  this.blotterService.getQuoteIds().pipe(
-    switchMap(ids => this.activeState.pipe(
-      map(gridstate => ({ ids, gridstate })) // Combine ids and gridstate into an object
-    ))
-  ).subscribe(({ ids, gridstate }) => {
-    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
-  });
-}
+  constructor(private clipboard: Clipboard) { }
 
-import { mergeMap } from 'rxjs/operators';
+  copyToClipboard() {
+    const blobHtml = new Blob([this.boldText], { type: "text/html" });
+    const blobText = new Blob([this.originalText], { type: "text/plain" });
 
-downloadEmail() {
-  this.blotterService.getQuoteIds().pipe(
-    mergeMap(ids => this.activeState.pipe(
-      map(gridstate => this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate))
-    ))
-  ).subscribe();
-}
+    const data = [new ClipboardItem({
+      ["text/plain"]: blobText,
+      ["text/html"]: blobHtml,
+    })];
 
-downloadEmail() {
-  combineLatest([
-    this.blotterService.getQuoteIds(),
-    this.activeState
-  ]).subscribe(([ids, gridstate]) => {
-    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
-  });
-}
-
-downloadEmail() {
-  this.activeState.pipe(
-    startWith(null), // Trigger initial emission
-    switchMap(gridstate => this.blotterService.getQuoteIds().pipe(
-      map(ids => ({ ids, gridstate }))
-    ))
-  ).subscribe(({ ids, gridstate }) => {
-    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
-  });
-}
-
-downloadEmail() {
-  this.activeState.pipe(
-    startWith(null),
-    withLatestFrom(this.formControl.valueChanges.pipe(startWith(null))),
-    withLatestFrom(this.blotterService.getQuoteIds())
-  ).subscribe(([[gridstate, formValue], ids]) => {
-    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate, formValue);
-  });
+    this.clipboard.write(data).then(
+      () => {
+        alert('Success: Copied to clipboard');
+      },
+      (error) => {
+        console.error('Error copying to clipboard: ', error);
+      }
+    );
+  }
 }
 
 
-downloadEmail() {
-  this.blotterService.getQuoteIds().pipe(
-    withLatestFrom(this.activeState), // Combine emissions with latest value from activeState
-    map(([ids, gridstate]) => ({ ids, gridstate })) // Combine ids and gridstate into an object
-  ).subscribe(({ ids, gridstate }) => {
-    this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate);
-  });
-}
 
-downloadEmail() {
-  return this.blotterService.getQuoteIds().pipe(
-    withLatestFrom(this.activeState), // Combine emissions with latest value from activeState
-    switchMap(([ids, gridstate]) =>
-      this.blotterEmailService.downlaodEmailTemplate(ids, this.selectedOption, gridstate)
-    )
-  );
-}
-
-getInitialTemplate(quoteIds: string[]): Observable<string[]> {
-  return this.apiConfigService.getInsightHost().pipe(
-    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
-    switchMap((url: string) =>
-      this.http.post<string[]>(url, data).pipe(
-        tap(response => {
-          if (response && response.length > 0) {
-            // Set the initial value of the form control
-            this.yourFormControl.setValue(response[0]);
-          }
-        })
-      )
-    )
-  );
-}
-
-getInitialTemplate(quoteIds: string[]): Observable<string[]> {
-  return this.apiConfigService.getInsightHost().pipe(
-    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
-    switchMap((url: string) =>
-      this.http.post<string[]>(url, data)
-    ),
-    map(response => response.body) // Extract the body property
-  );
-}
-
-writeToClipboard(html: string): void {
-  const clipboardItem = new ClipboardItem({
-    'text/html': new Blob([html], { type: 'text/html' }),
-    'text/plain': new Blob([html], { type: 'text/plain' })
-  });
-
-  navigator.clipboard.write([clipboardItem])
-    .then(() => console.log('clipboard.write() Ok'))
-    .catch(error => alert(error));
-}
-}
