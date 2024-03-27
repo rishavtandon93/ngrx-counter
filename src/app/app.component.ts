@@ -303,5 +303,21 @@ export class ClipboardExampleComponent {
   }
 }
 
+originalText = "Original Text";
+boldText = "<b>" + this.originalText + "</b>";
+blobHtml = new Blob([this.boldText], { type: "text/html" });
+blobText = new Blob([this.originalText], { type: "text/plain" });
+data = [new ClipboardItem({
+  ["text/plain"]: this.blobText,
+  ["text/html"]: this.blobHtml,
+})];
+
+copyToClipboard(): void {
+  navigator.clipboard.write(this.data).then(
+    () => { alert('Success HTML copy'); },
+    () => { }
+  );
+}
+
 
 
