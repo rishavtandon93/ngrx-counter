@@ -281,6 +281,26 @@ export class ClipboardExampleComponent {
       }
     );
   }
+
+
+
+  copyToClipboard() {
+    const iframeContent = this.iframeRef.nativeElement.contentDocument;
+    const iframeHtml = iframeContent.documentElement.outerHTML;
+
+    const dummyTextArea = document.createElement('textarea');
+    dummyTextArea.style.position = 'fixed';
+    dummyTextArea.style.opacity = '0';
+    dummyTextArea.value = iframeHtml;
+    document.body.appendChild(dummyTextArea);
+
+    dummyTextArea.select();
+    document.execCommand('copy');
+
+    document.body.removeChild(dummyTextArea);
+
+    console.log('Copied to clipboard successfully');
+  }
 }
 
 
