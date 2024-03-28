@@ -319,5 +319,12 @@ copyToClipboard(): void {
   );
 }
 
+ngAfterViewInit() {
+  this.safeHTMLData$.subscribe(data => {
+    const iframeDocument = this.iframeElement.nativeElement.contentDocument || this.iframeElement.nativeElement.contentWindow.document;
+    iframeDocument.body.innerHTML = this.sanitizer.sanitize(data); // Sanitize the data before setting it
+  });
+}
+
 
 
