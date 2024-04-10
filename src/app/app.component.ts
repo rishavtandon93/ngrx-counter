@@ -44,8 +44,31 @@ export class AppComponent implements OnInit {
 
   listOfDates = ['2024-04-08', '2024-04-09'];
 
+  data3: BlotterMetaData = {
+    details: [
+      { submissionDate: '2024-04-07', count: 1 },
+      { submissionDate: '2024-04-08', count: 5 },
+      { submissionDate: '2024-04-09', count: 10 },
+      { submissionDate: '2024-04-10', count: 15 }
+    ],
+    totalCount: 31,
+  };
+
+  data4: BlotterMetaData = {
+    details: [
+      { submissionDate: '2024-04-08', count: 1 },
+      { submissionDate: '2024-04-09', count: 5 },
+      { submissionDate: '2024-04-10', count: 10 },
+      { submissionDate: '2024-04-11', count: 15 }
+    ],
+    totalCount: 31,
+  };
+
+  listOfDates2 = ['2024-04-08', '2024-04-09', '2024-04-10'];
+
+
   ngOnInit(): void {
-    this.updateDetailsClean(this.data2, this.listOfDates);
+    this.updateDetailsClean(this.data4, this.listOfDates2);
   }
 
   updateDetails(data: BlotterMetaData, listOfDates: string[]): any {
