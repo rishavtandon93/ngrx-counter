@@ -1,168 +1,151 @@
-
-// I want to write a function such that
-
-// it will have two parameters as arguments
-
-// 'data' of type BlotterMetaData and 'listOfDates' of type string[]
-
-// export interface BlotterMetaData {
-// totalCount: number;
-// details: Details[];
-// fetchedCount: number;
-// }
-
-// export interface Detail {
-// submissionDate: string;
-// count: number;
-// }
-
-
-// If input for
-
-// data = {
-// details: [
-// { submissionDate: '2024-04-08' , count: 1302 },
-// { submissionDate: '2024-04-09' , count: 1126 },
-// { submissionDate: '2024-04-10' , count: 47 },
-// ],
-// totalCount: 2475
-// }
-
-// and input for list of dates = ['2024-04-08', '2024-04-09']
-
-// I want output as
-
-// data = {
-// details: [
-// { submissionDate: '2024-04-08' , count: 1302 },
-// { submissionDate: '2024-04-09' , count: 1173 },
-// ],
-// totalCount: 2475
-// }
-
-// logic behind above is if extra date in data which in above case is  2024-04-10 is bigger than 2024-04-09
-
-// it should add  2024-04-10 date count which is 47 to count of 2024-04-09 which is 1126 and produce output like
-
-// data = {
-// details: [
-// { submissionDate: '2024-04-08' , count: 1302 },
-// { submissionDate: '2024-04-09' , count: 1173 },
-// ],
-// totalCount: 2475
-// }
-
-
-// also if input like
-
-// data = {
-// details: [
-// { submissionDate: '2024-04-07' , count: 55 },
-// { submissionDate: '2024-04-08' , count: 2118 },
-// { submissionDate: '2024-04-09' , count: 1014},
-// ],
-// totalCount: 3187
-// }
-
-// and listOfDates = [2024-04-08, 2024-04-09 ]
-
-// I want output as
-
-// data = {
-// details: [
-// { submissionDate: '2024-04-08' , count: 2173 },
-// { submissionDate: '2024-04-09' , count: 1014 },
-// ],
-// totalCount: 3187
-// }
-
-// logic behind above is if extra date in data which in above case is  2024-04-07 is less than 2024-04-08
-
-// it should add  2024-04-07 date count which is 55 to count of 2024-04-08 which is 2118 and produce output like
-
-// data = {
-// details: [
-// { submissionDate: '2024-04-08' , count: 2173 },
-// { submissionDate: '2024-04-09' , count: 1014 },
-// ],
-// totalCount: 3187
-// }
-
-
-function updateDetails(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
-  let updatedDetails: Detail[] = [];
-  let extraCount = 0; // To accumulate counts of dates not in the listOfDates.
-
-  data.details.forEach((detail) => {
-      if (listOfDates.includes(detail.submissionDate)) {
-          // If the submissionDate is in listOfDates, we simply push it to updatedDetails.
-          updatedDetails.push(detail);
-      } else {
-          // If not, we add its count to extraCount.
-          extraCount += detail.count;
-      }
-  });
-
-  // If there is any extraCount, add it to the last date in the listOfDates that is present in updatedDetails.
-  if (extraCount > 0 && updatedDetails.length > 0) {
-      let lastValidDateIndex = updatedDetails.findIndex(detail => detail.submissionDate === listOfDates[listOfDates.length - 1]);
-      if (lastValidDateIndex !== -1) {
-          updatedDetails[lastValidDateIndex].count += extraCount;
-      }
-  }
-
-  // Return new data object with updated details and totalCount (unchanged).
-  return {
-      ...data,
-      details: updatedDetails,
-  };
+import { Component, OnInit } from '@angular/core';
+import {
+  Observable,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+  withLatestFrom,
+} from 'rxjs';
+import { BlotterMetaData, Detail } from './enums';
+export interface LanguageSpecficProductNameValues {
+  [language: string]: string;
 }
 
-// Example usage:
-const data = {
-  details: [
+export interface LanguageSpecficProductNamePayload {
+  defaultLanguage: string;
+  languageSpecficProductName: LanguageSpecficProductNameValues[];
+}
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+})
+export class AppComponent implements OnInit {
+  title = 'NgRx_Counter';
+
+  data: BlotterMetaData = {
+    details: [
       { submissionDate: '2024-04-08', count: 10 },
       { submissionDate: '2024-04-09', count: 20 },
       { submissionDate: '2024-04-10', count: 5 },
-  ],
-  totalCount: 35,
-};
+    ],
+    totalCount: 35,
+  };
 
-const listOfDates = ['2024-04-08', '2024-04-09'];
-const updatedData = updateDetails(data, listOfDates);
+  data2: BlotterMetaData = {
+    details: [
+      { submissionDate: '2024-04-07', count: 1 },
+      { submissionDate: '2024-04-08', count: 5 },
+      { submissionDate: '2024-04-09', count: 10 },
+    ],
+    totalCount: 16,
+  };
 
-console.log(updatedData);
+  listOfDates = ['2024-04-08', '2024-04-09'];
 
-
-function updateDetails(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
-  let updatedDetails: Detail[] = [];
-  let extraCount = 0; // To accumulate counts of dates not in the listOfDates.
-
-  // Iterate through each detail
-  data.details.forEach((detail) => {
-      if (listOfDates.includes(detail.submissionDate)) {
-          // If the submissionDate is in listOfDates, add it to updatedDetails
-          updatedDetails.push(detail);
-      } else {
-          // If not, add its count to extraCount
-          extraCount += detail.count;
-      }
-  });
-
-  // If there is any extraCount, add it to the count of the last valid date in updatedDetails
-  if (extraCount > 0 && updatedDetails.length > 0) {
-      // Assuming the last date in listOfDates is the one to get the extra counts
-      let lastValidDate = listOfDates[listOfDates.length - 1];
-      let lastValidDetail = updatedDetails.find(detail => detail.submissionDate === lastValidDate);
-      if (lastValidDetail) {
-          lastValidDetail.count += extraCount;
-      } else {
-          // If the last date in listOfDates wasn't initially in the details but needs to receive extra counts
-          updatedDetails.push({ submissionDate: lastValidDate, count: extraCount });
-      }
+  ngOnInit(): void {
+    this.updateDetailsClean(this.data2, this.listOfDates);
   }
 
-  return {
+  updateDetails(data: BlotterMetaData, listOfDates: string[]): any {
+    // Prepare a container for updated details. Initially empty.
+    let updatedDetails: any[] = [];
+
+    // Track the index in updatedDetails where the last date's count should be added to.
+    let lastIndexOfValidDate = -1;
+
+    // Iterate over each detail in the original data.
+    data.details.forEach((detail) => {
+      if (listOfDates.includes(detail.submissionDate)) {
+        // If the date is in listOfDates, add it directly to updatedDetails.
+        updatedDetails.push(detail);
+        lastIndexOfValidDate = updatedDetails.length - 1; // Update the index to the latest valid date.
+      } else {
+        // For dates not in listOfDates, add their count to the last valid detail's count, if any.
+        if (lastIndexOfValidDate !== -1) {
+          updatedDetails[lastIndexOfValidDate].count += detail.count;
+        }
+      }
+    });
+
+    // Return the updated BlotterMetaData object, keeping totalCount the same as input.
+    const output = {
       ...data,
       details: updatedDetails,
-  };
+    };
+
+    console.log(output);
+  }
+
+  updateDetailsNew(data: BlotterMetaData, listOfDates: string[]): void {
+    let updatedDetails: Detail[] = data.details.filter((detail) =>
+      listOfDates.includes(detail.submissionDate)
+    );
+    let extraCountBefore = 0;
+    let extraCountAfter = 0;
+    let maxDateInList = new Date(
+      Math.max(...listOfDates.map((date) => new Date(date).getTime()))
+    );
+
+    data.details.forEach((detail) => {
+      if (!listOfDates.includes(detail.submissionDate)) {
+        const detailDate = new Date(detail.submissionDate);
+        if (detailDate <= maxDateInList) {
+          extraCountBefore += detail.count;
+        } else {
+          extraCountAfter += detail.count;
+        }
+      }
+    });
+
+    if (updatedDetails.length > 0) {
+      // Add counts from dates before the maxDateInList to the first date in updatedDetails
+      if (extraCountBefore > 0) {
+        updatedDetails[0].count += extraCountBefore;
+      }
+
+      // Add counts from dates after the maxDateInList to the last date in updatedDetails
+      if (extraCountAfter > 0) {
+        updatedDetails[updatedDetails.length - 1].count += extraCountAfter;
+      }
+    }
+
+    const output = {
+      ...data,
+      details: updatedDetails,
+    };
+    console.log(output);
+  }
+
+  updateDetailsClean(data: BlotterMetaData, listOfDates: string[]): void {
+    const dateTimestamps = new Set(listOfDates.map(date => new Date(date).getTime()));
+    const maxDateInListTimestamp = Math.max(...dateTimestamps);
+
+    let extraCountBefore = 0;
+    let extraCountAfter = 0;
+
+    const updatedDetails = data.details.reduce((acc, detail) => {
+        const detailTimestamp = new Date(detail.submissionDate).getTime();
+
+        if (dateTimestamps.has(detailTimestamp)) {
+            acc.push(detail); // Retain matching details
+        } else {
+            // Accumulate counts before or after the max date in the list
+            detailTimestamp <= maxDateInListTimestamp ?
+                extraCountBefore += detail.count :
+                extraCountAfter += detail.count;
+        }
+
+        return acc;
+    }, [] as Detail[]);
+
+    if (updatedDetails.length) {
+        // Distribute extra counts among the first and last updated details
+        updatedDetails[0].count += extraCountBefore;
+        updatedDetails[updatedDetails.length - 1].count += extraCountAfter;
+    }
+
+    console.log({ ...data, details: updatedDetails });
+  }
+}
