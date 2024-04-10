@@ -1,330 +1,128 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, combineLatest, distinctUntilChanged, map, withLatestFrom } from 'rxjs';
-export interface LanguageSpecficProductNameValues {
-  [language: string]: string;
-}
 
-export interface LanguageSpecficProductNamePayload {
-  defaultLanguage: string;
-  languageSpecficProductName: LanguageSpecficProductNameValues[];
-}
+// I want to write a function such that
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-})
-export class AppComponent implements OnInit {
-  title = 'NgRx_Counter';
+// it will have two parameters as arguments
 
-  constructor() {
-    this.example();
-  }
+// 'data' of type BlotterMetaData and 'listOfDates' of type string[]
 
-  ngOnInit(): void {}
+// export interface BlotterMetaData {
+// totalCount: number;
+// details: Details[];
+// fetchedCount: number;
+// }
 
-  example() {
-    let result: LanguageSpecficProductNameValues[] = [
-      { EN: 'abc' },
-      { DE: 'gef' },
-      { ESP: 'abc' },
-    ];
-
-    let languages = ['EN', 'DE', 'ESP', 'CS'];
-
-    languages.forEach((language) => {
-      if (!result.some((obj) => obj[language] !== undefined)) {
-        result.push({ [language]: '' });
-      } else if (result.some((obj) => obj[language] === '')) {
-        result.forEach((obj) => {
-          if (obj[language] === '') {
-            obj[language] = 'newValue'; // Replace 'newValue' with the desired value
-          }
-        });
-      }
-    });
-
-    console.log(result);
-
-    languages.push('FR');
-
-    languages.forEach((language) => {
-      if (!result.some((obj) => obj[language] !== undefined)) {
-        result.push({ [language]: '' });
-      } else if (result.some((obj) => obj[language] === '')) {
-        result.forEach((obj) => {
-          if (obj[language] === '') {
-            obj[language] = ''; // Replace 'newValue' with the desired value
-          }
-        });
-      }
-    });
-
-    console.log(result);
-  }
-
-  // example() {
-  //   //const val1: any = this.getValue(undefined) === undefined ? 0 : this.getValue(4);
-  //   const val1: any = this.getValue(undefined) || 0;
-  //   console.log(val1);
-  // }
-
-  getValue(value: any) {
-    return value;
-  }
-
-  updateResultArray(
-    result: { [key: string]: string }[],
-    languages: string[]
-  ): void {
-    // Remove languages that exist in languages array but not in result array
-    languages
-      .filter((language) => !result.some((obj) => obj.hasOwnProperty(language)))
-      .forEach((languageToRemove) => {
-        const indexToRemove = languages.indexOf(languageToRemove);
-        if (indexToRemove !== -1) {
-          languages.splice(indexToRemove, 1);
-        }
-      });
-
-    // Add new objects for missing languages in result array
-    languages.forEach((language) => {
-      if (!result.some((obj) => obj[language] !== undefined)) {
-        result.push({ [language]: '' });
-      } else if (result.some((obj) => obj[language] === '')) {
-        result.forEach((obj) => {
-          if (obj[language] === '') {
-            obj[language] = 'newValue'; // Replace 'newValue' with the desired value
-          }
-        });
-      }
-    });
-  }
-
-  addLanguageToProductName(
-    selectLanguages: string[],
-    selectedLanguageWithProductName: LanguageSpecficProductNameValues[],
-    defaultProductName: string
-  ): LanguageSpecficProductNameValues[] {
-    return [
-      ...selectedLanguageWithProductName,
-      ...selectLanguages
-        .filter(language => !selectedLanguageWithProductName.some(obj => obj[language] !== undefined))
-        .map(language => ({ [language]: defaultProductName }))
-    ];
-  }
-
-  // const selectLanguages = ['FR', 'DE', 'CS'];
-  // const selectedLanguageWithProductName = [
-  //   { EN: 'abc' },
-  //   { DE: 'gef' },
-  // ];
-  // const defaultProductName = 'abc';
-
-  // const result = addLanguageToProductName(selectLanguages, selectedLanguageWithProductName, defaultProductName);
-  // console.log(result);
-
-  // function stringifyLanguageSpecficProductName(payload: LanguageSpecficProductNamePayload): string {
-  //   const { defaultLanguage, languageSpecficProductName } = payload;
-
-  //   // Map each language-product name pair to a string in the format "language: productName"
-  //   const pairs = languageSpecficProductName.map(obj => {
-  //     const [language, productName] = Object.entries(obj)[0];
-  //     return `${language}: ${productName}`;
-  //   });
-
-  //   // Join the pairs with commas and prepend the default language followed by a pipe character
-  //   return `${defaultLanguage} | ${pairs.join(', ')}`;
-  // }
-
-  import { Component } from '@angular/core';
-  import { ICellRendererAngularComp } from 'ag-grid-angular';
-
-  @Component({
-    selector: 'app-custom-renderer',
-    template: `<span [style.color]="getTextColor()" [innerHTML]="getText()"></span>`
-  })
-  export class CustomRendererComponent implements ICellRendererAngularComp {
-    value: any;
-
-    agInit(params: any): void {
-      this.value = params.value;
-    }
-
-    getTextColor(): string {
-      if (typeof this.value === 'object' && this.value.color) {
-        return this.value.color;
-      }
-      return 'black'; // Default color
-    }
-
-    getText(): string {
-      if (typeof this.value === 'object' && this.value.text) {
-        return this.value.text;
-      }
-      return this.value;
-    }
-
-    refresh(): boolean {
-      return false;
-    }
-  }
+// export interface Detail {
+// submissionDate: string;
+// count: number;
+// }
 
 
-  function removeLogLevelFromString(str) {
-    // Define the regular expression pattern
-    const pattern = /\[(Fatal|Warn)\]:\s*/;
+// If input for
 
-    // Use the replace method with the regular expression to remove the pattern
-    const newStr = str.replace(pattern, '');
+// data = {
+// details: [
+// { submissionDate: '2024-04-08' , count: 1302 },
+// { submissionDate: '2024-04-09' , count: 1126 },
+// { submissionDate: '2024-04-10' , count: 47 },
+// ],
+// totalCount: 2475
+// }
 
-    return newStr;
-}
+// and input for list of dates = ['2024-04-08', '2024-04-09']
 
-function getInitialTemplate(quoteIds: string[]): void {
-  this.apiConfigService.getInsightHost().pipe(
-    map((insightHost) => insightUrls.getInitialHTMLTemplate(insightHost)),
-    switchMap((url: string) =>
-      this.http.post<any>(url, data)
-    )
-  ).susbcribe((response: any) => {
-    this.inititalTemplate = response.body
-  })
-}
+// I want output as
 
-const getTimezonePart = (dt: DateTime): string => {
-  const timeZonesToDisplay = availableTimeZones;
-  const offset = dt.toFormat('ZZ');
-  const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
-  return timezone.length ? timezone[0].abbreviation : `UTC ${offset}`;
-};
+// data = {
+// details: [
+// { submissionDate: '2024-04-08' , count: 1302 },
+// { submissionDate: '2024-04-09' , count: 1173 },
+// ],
+// totalCount: 2475
+// }
 
-const getTimePartWithStyle = (timePart: string, styleClass: string): string => {
-  return `<span class="${styleClass}">${timePart}</span>`;
-};
+// logic behind above is if extra date in data which in above case is  2024-04-10 is bigger than 2024-04-09
 
-const getTimePartWithoutStyle = (timePart: string): string => {
-  return timePart;
-};
+// it should add  2024-04-10 date count which is 47 to count of 2024-04-09 which is 1126 and produce output like
 
-const convertDateTime = (date: string, styleClass?: string): string => {
-  const formattedISO = date.replace(' ', 'T');
-  const dt = DateTime.fromISO(formattedISO, { setZone: true });
-
-  const datePart = dt.toFormat('yyyy-MM-dd');
-  const timePart = dt.toFormat('HH:mm:ss');
-
-  const timezonePart = getTimezonePart(dt);
-  const timePartWithStyle = styleClass ? getTimePartWithStyle(timePart, styleClass) : getTimePartWithoutStyle(timePart);
-
-  return `${datePart} ${timePartWithStyle} ${timezonePart}`;
-};
+// data = {
+// details: [
+// { submissionDate: '2024-04-08' , count: 1302 },
+// { submissionDate: '2024-04-09' , count: 1173 },
+// ],
+// totalCount: 2475
+// }
 
 
-interface DateTimeInfo {
-  datePart: string;
-  timePart: string;
-  timeZonePart: string;
-}
+// also if input like
 
-const convertDateTime = (date: string): DateTimeInfo => {
-  const timeZonesToDisplay = availableTimeZones;
+// data = {
+// details: [
+// { submissionDate: '2024-04-07' , count: 55 },
+// { submissionDate: '2024-04-08' , count: 2118 },
+// { submissionDate: '2024-04-09' , count: 1014},
+// ],
+// totalCount: 3187
+// }
 
-  const formattedISO = date.replace(' ', 'T');
-  const dt = DateTime.fromISO(formattedISO, { setZone: true });
+// and listOfDates = [2024-04-08, 2024-04-09 ]
 
-  const datePart = dt.toFormat('yyyy-MM-dd');
-  const timePart = dt.toFormat('HH:mm:ss');
-  const offset = dt.toFormat('ZZ');
+// I want output as
 
-  const timezone = timeZonesToDisplay.filter((tz) => tz.rawOffsetInMinutes === dt.offset);
-  const timeZonePart = timezone.length ? timezone[0].abbreviation : `UTC ${offset}`;
+// data = {
+// details: [
+// { submissionDate: '2024-04-08' , count: 2173 },
+// { submissionDate: '2024-04-09' , count: 1014 },
+// ],
+// totalCount: 3187
+// }
 
-  return {
-    datePart: datePart,
-    timePart: timePart,
-    timeZonePart: timeZonePart
+// logic behind above is if extra date in data which in above case is  2024-04-07 is less than 2024-04-08
+
+// it should add  2024-04-07 date count which is 55 to count of 2024-04-08 which is 2118 and produce output like
+
+// data = {
+// details: [
+// { submissionDate: '2024-04-08' , count: 2173 },
+// { submissionDate: '2024-04-09' , count: 1014 },
+// ],
+// totalCount: 3187
+// }
+
+function adjustCounts(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
+  const newData: BlotterMetaData = {
+      totalCount: data.totalCount,
+      details: []
   };
-};
 
+  let extraCount = 0;
 
-import { Component } from '@angular/core';
-import { Clipboard } from '@angular/cdk/clipboard';
-
-@Component({
-  selector: 'app-clipboard-example',
-  templateUrl: './clipboard-example.component.html',
-  styleUrls: ['./clipboard-example.component.css']
-})
-export class ClipboardExampleComponent {
-
-  originalText = "Original Text";
-  boldText = `<b>${this.originalText}</b>`;
-
-  constructor(private clipboard: Clipboard) { }
-
-  copyToClipboard() {
-    const blobHtml = new Blob([this.boldText], { type: "text/html" });
-    const blobText = new Blob([this.originalText], { type: "text/plain" });
-
-    const data = [new ClipboardItem({
-      ["text/plain"]: blobText,
-      ["text/html"]: blobHtml,
-    })];
-
-    this.clipboard.write(data).then(
-      () => {
-        alert('Success: Copied to clipboard');
-      },
-      (error) => {
-        console.error('Error copying to clipboard: ', error);
+  for (const detail of data.details) {
+      if (!listOfDates.includes(detail.submissionDate)) {
+          extraCount += detail.count;
+      } else {
+          newData.details.push({ ...detail, count: detail.count + extraCount });
+          extraCount = 0;
       }
-    );
   }
 
-
-
-  copyToClipboard() {
-    const iframeContent = this.iframeRef.nativeElement.contentDocument;
-    const iframeHtml = iframeContent.documentElement.outerHTML;
-
-    const dummyTextArea = document.createElement('textarea');
-    dummyTextArea.style.position = 'fixed';
-    dummyTextArea.style.opacity = '0';
-    dummyTextArea.value = iframeHtml;
-    document.body.appendChild(dummyTextArea);
-
-    dummyTextArea.select();
-    document.execCommand('copy');
-
-    document.body.removeChild(dummyTextArea);
-
-    console.log('Copied to clipboard successfully');
-  }
+  return newData;
 }
 
-originalText = "Original Text";
-boldText = "<b>" + this.originalText + "</b>";
-blobHtml = new Blob([this.boldText], { type: "text/html" });
-blobText = new Blob([this.originalText], { type: "text/plain" });
-data = [new ClipboardItem({
-  ["text/plain"]: this.blobText,
-  ["text/html"]: this.blobHtml,
-})];
 
-copyToClipboard(): void {
-  navigator.clipboard.write(this.data).then(
-    () => { alert('Success HTML copy'); },
-    () => { }
-  );
-}
+function adjustCounts(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
+  const { details } = data;
 
-ngAfterViewInit() {
-  this.safeHTMLData$.subscribe(data => {
-    const iframeDocument = this.iframeElement.nativeElement.contentDocument || this.iframeElement.nativeElement.contentWindow.document;
-    iframeDocument.body.innerHTML = this.sanitizer.sanitize(data); // Sanitize the data before setting it
+  details.forEach((currentDetail, index) => {
+      const currentDate = currentDetail.submissionDate;
+      const nextDetail = details[index + 1];
+      const nextDate = nextDetail ? nextDetail.submissionDate : null;
+
+      if (nextDate && !listOfDates.includes(currentDate) && listOfDates.includes(nextDate)) {
+          const currentIndex = listOfDates.indexOf(nextDate);
+          details[currentIndex - 1].count += currentDetail.count;
+          details.splice(index, 1);
+      }
   });
+
+  return data;
 }
-
-
-
