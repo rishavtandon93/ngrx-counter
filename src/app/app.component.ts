@@ -133,3 +133,36 @@ const updatedData = updateDetails(data, listOfDates);
 
 console.log(updatedData);
 
+
+function updateDetails(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
+  let updatedDetails: Detail[] = [];
+  let extraCount = 0; // To accumulate counts of dates not in the listOfDates.
+
+  // Iterate through each detail
+  data.details.forEach((detail) => {
+      if (listOfDates.includes(detail.submissionDate)) {
+          // If the submissionDate is in listOfDates, add it to updatedDetails
+          updatedDetails.push(detail);
+      } else {
+          // If not, add its count to extraCount
+          extraCount += detail.count;
+      }
+  });
+
+  // If there is any extraCount, add it to the count of the last valid date in updatedDetails
+  if (extraCount > 0 && updatedDetails.length > 0) {
+      // Assuming the last date in listOfDates is the one to get the extra counts
+      let lastValidDate = listOfDates[listOfDates.length - 1];
+      let lastValidDetail = updatedDetails.find(detail => detail.submissionDate === lastValidDate);
+      if (lastValidDetail) {
+          lastValidDetail.count += extraCount;
+      } else {
+          // If the last date in listOfDates wasn't initially in the details but needs to receive extra counts
+          updatedDetails.push({ submissionDate: lastValidDate, count: extraCount });
+      }
+  }
+
+  return {
+      ...data,
+      details: updatedDetails,
+  };
