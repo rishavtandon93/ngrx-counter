@@ -88,40 +88,48 @@
 // totalCount: 3187
 // }
 
-function adjustBlotterData(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
-  // Create a copy of the original data to avoid unintended side effects
-  const adjustedData = { ...data };
 
-  const detailsMap = new Map<string, number>(); // Use a map for efficient lookups
+function updateDetails(data: BlotterMetaData, listOfDates: string[]): BlotterMetaData {
+  let updatedDetails: Detail[] = [];
+  let extraCount = 0; // To accumulate counts of dates not in the listOfDates.
 
-  // Populate the map with counts for each date in the original details
-  for (const detail of data.details) {
-    detailsMap.set(detail.submissionDate, detail.count);
-  }
-
-  // Iterate through listOfDates
-  for (const date of listOfDates) {
-    const count = detailsMap.get(date) || 0; // Get existing count or default to 0
-    detailsMap.set(date, count); // Update or add the count for this date
-
-    // If the date in listOfDates is after the last date in adjustedData.details
-    const lastDetailDate = adjustedData.details.length > 0 ? adjustedData.details[adjustedData.details.length - 1].submissionDate : undefined;
-    if (lastDetailDate && new Date(date).getTime() > new Date(lastDetailDate).getTime()) {
-      // Find the detail in adjustedData.details with the closest submissionDate before the current date
-      let closestDetailIndex = adjustedData.details.length - 1;
-      while (closestDetailIndex >= 0 && new Date(adjustedData.details[closestDetailIndex].submissionDate).getTime() > new Date(date).getTime()) {
-        closestDetailIndex--;
-      }
-
-      // If a closest detail is found, update its count with the combined count
-      if (closestDetailIndex >= 0) {
-        adjustedData.details[closestDetailIndex].count += detailsMap.get(date);
+  data.details.forEach((detail) => {
+      if (listOfDates.includes(detail.submissionDate)) {
+          // If the submissionDate is in listOfDates, we simply push it to updatedDetails.
+          updatedDetails.push(detail);
       } else {
-        // If no closest detail is found, add a new detail for the current date
-        adjustedData.details.push({ submissionDate: date, count: detailsMap.get(date) });
+          // If not, we add its count to extraCount.
+          extraCount += detail.count;
       }
-    }
+  });
+
+  // If there is any extraCount, add it to the last date in the listOfDates that is present in updatedDetails.
+  if (extraCount > 0 && updatedDetails.length > 0) {
+      let lastValidDateIndex = updatedDetails.findIndex(detail => detail.submissionDate === listOfDates[listOfDates.length - 1]);
+      if (lastValidDateIndex !== -1) {
+          updatedDetails[lastValidDateIndex].count += extraCount;
+      }
   }
 
-  return adjustedData;
+  // Return new data object with updated details and totalCount (unchanged).
+  return {
+      ...data,
+      details: updatedDetails,
+  };
 }
+
+// Example usage:
+const data = {
+  details: [
+      { submissionDate: '2024-04-08', count: 10 },
+      { submissionDate: '2024-04-09', count: 20 },
+      { submissionDate: '2024-04-10', count: 5 },
+  ],
+  totalCount: 35,
+};
+
+const listOfDates = ['2024-04-08', '2024-04-09'];
+const updatedData = updateDetails(data, listOfDates);
+
+console.log(updatedData);
+
