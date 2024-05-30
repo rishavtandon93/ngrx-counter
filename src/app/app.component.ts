@@ -4,6 +4,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   map,
+  switchMap,
   withLatestFrom,
 } from 'rxjs';
 import { BlotterMetaData, Detail } from './enums';
@@ -49,7 +50,7 @@ export class AppComponent implements OnInit {
       { submissionDate: '2024-04-07', count: 1 },
       { submissionDate: '2024-04-08', count: 5 },
       { submissionDate: '2024-04-09', count: 10 },
-      { submissionDate: '2024-04-10', count: 15 }
+      { submissionDate: '2024-04-10', count: 15 },
     ],
     totalCount: 31,
   };
@@ -59,7 +60,7 @@ export class AppComponent implements OnInit {
       { submissionDate: '2024-04-08', count: 1 },
       { submissionDate: '2024-04-09', count: 5 },
       { submissionDate: '2024-04-10', count: 10 },
-      { submissionDate: '2024-04-11', count: 15 }
+      { submissionDate: '2024-04-11', count: 15 },
     ],
     totalCount: 31,
   };
@@ -75,7 +76,6 @@ export class AppComponent implements OnInit {
   };
 
   listOfDates3 = ['2024-04-08'];
-
 
   ngOnInit(): void {
     this.updateDetailsClean(this.data5, this.listOfDates3);
@@ -152,33 +152,83 @@ export class AppComponent implements OnInit {
   }
 
   updateDetailsClean(data: BlotterMetaData, listOfDates: string[]): void {
-    const dateTimestamps = new Set(listOfDates.map(date => new Date(date).getTime()));
+    const dateTimestamps = new Set(
+      listOfDates.map((date) => new Date(date).getTime())
+    );
     const maxDateInListTimestamp = Math.max(...dateTimestamps);
 
     let extraCountBefore = 0;
     let extraCountAfter = 0;
 
     const updatedDetails = data.details.reduce((acc, detail) => {
-        const detailTimestamp = new Date(detail.submissionDate).getTime();
+      const detailTimestamp = new Date(detail.submissionDate).getTime();
 
-        if (dateTimestamps.has(detailTimestamp)) {
-            acc.push(detail); // Retain matching details
-        } else {
-            // Accumulate counts before or after the max date in the list
-            detailTimestamp <= maxDateInListTimestamp ?
-                extraCountBefore += detail.count :
-                extraCountAfter += detail.count;
-        }
+      if (dateTimestamps.has(detailTimestamp)) {
+        acc.push(detail); // Retain matching details
+      } else {
+        // Accumulate counts before or after the max date in the list
+        detailTimestamp <= maxDateInListTimestamp
+          ? (extraCountBefore += detail.count)
+          : (extraCountAfter += detail.count);
+      }
 
-        return acc;
+      return acc;
     }, [] as Detail[]);
 
     if (updatedDetails.length) {
-        // Distribute extra counts among the first and last updated details
-        updatedDetails[0].count += extraCountBefore;
-        updatedDetails[updatedDetails.length - 1].count += extraCountAfter;
+      // Distribute extra counts among the first and last updated details
+      updatedDetails[0].count += extraCountBefore;
+      updatedDetails[updatedDetails.length - 1].count += extraCountAfter;
     }
 
     console.log({ ...data, details: updatedDetails });
   }
+
+  getDynamicEmailTemplate(): void {
+    this.cdeskblotterEmailService.getQuoteIds().pipe(
+      withLatestFrom(this.gridStatesServie.activeSate$),
+      first(),
+      map(([ids, gridSate]) => ({ ids, gridSate }))
+    );
+  }
+
+  getDynamicEmailTemplateNew(
+    quoteIds: string[],
+    state: GridSate,
+    selectedEmailTemplate: string
+  ): Observable<HttpRequestState<String>> {
+    const data = {
+      quoteIds,
+      layout: state,
+    };
+
+    return httpMappers.mapToHttpRequestState<string>(
+      this.appConfigService.getInsightHost().pipe(
+        first(),
+        map((insightHost: string) =>
+          insightUrls.getInitialDynamicHtmlTemplate(
+            insightHost,
+            selectedEmailTemplate
+          )
+        ),
+        switchMap((url: string) =>
+          this.http.post<string>(url, data, {
+            responseType: 'text' as 'json',
+          })
+        )
+      )
+    );
+  }
 }
+`
+
+
+this.refresh$.pipe(
+  startWith(null), // Trigger the stream initially
+  withLatestFrom(this.haloId$),
+  map(([_, haloId]) => haloId),
+  takeUntil(this.destroyed$)
+).subscribe((quoteId: string) => {
+  this.quoteId = quoteId;
+  this.getFeedbackOptions(quoteId);
+});
