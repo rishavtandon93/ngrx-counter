@@ -4,6 +4,8 @@ import {
   combineLatest,
   distinctUntilChanged,
   map,
+  merge,
+  shareReplay,
   switchMap,
   withLatestFrom,
 } from 'rxjs';
@@ -220,7 +222,22 @@ export class AppComponent implements OnInit {
     );
   }
 }
-`
+
+initFeedbackStream(): Observable<HttpRequestState<Feedback[]>> {
+  return merge(
+  this.haldoId$,
+  this.refresh$.piepe(switchMap() => this.haloId$.pipe(first(Boolean)))
+  ).pipe(
+    switchMap((id) =>
+      this.feedbackApiService.getFeedbackOption(id).pipe(
+     tap((feedbackOptions: HttpRequestState<FeedbackOption>) =>
+     this.setFeedbackOptions()
+     ),
+     switchMap(() => this.feedbackApiService.getFeedback(id))
+     ),
+     shareReplay({bufferSize: +, refCount: false})
+  )
+}
 
 
 this.refresh$.pipe(
@@ -232,3 +249,18 @@ this.refresh$.pipe(
   this.quoteId = quoteId;
   this.getFeedbackOptions(quoteId);
 });
+
+initFeedbackStream(): Observable<HttpRequestState<Feedback[]>> {
+  return merge(
+    this.haloId$,
+    this.refresh$.pipe(switchMap(() => this.haloId$.pipe(first(Boolean))))
+  ).pipe(
+    switchMap((id) =>
+      this.feedbackApiService.getFeedbackOption(id).pipe(
+        tap((feedbackOptions: HttpRequestState<FeedbackOption>) => this.setFeedbackOptions(feedbackOptions)),
+        switchMap(() => this.feedbackApiService.getFeedback(id))
+      )
+    ),
+    shareReplay({ bufferSize: 1, refCount: false })
+  );
+}
