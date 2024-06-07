@@ -253,12 +253,23 @@ this.refresh$.pipe(
 initFeedbackStream(): Observable<HttpRequestState<Feedback[]>> {
   return merge(
     this.haloId$,
-    this.refresh$.pipe(switchMap(() => this.haloId$.pipe(first(Boolean))))
+    this.refresh$.pipe(switchMap(() => this.haloId$.pipe(first())))
   ).pipe(
-    switchMap((id) =>
-      this.feedbackApiService.getFeedbackOption(id).pipe(
-        tap((feedbackOptions: HttpRequestState<FeedbackOption>) => this.setFeedbackOptions(feedbackOptions)),
-        switchMap(() => this.feedbackApiService.getFeedback(id))
+    exhaustMap(id =>
+      combineLatest([
+        this.feedbackApiService.getFeedbackOption(id).pipe(
+          tap(feedbackOptions => {
+            console.log('Feedback options received:', feedbackOptions);
+            this.setFeedbackOptions(feedbackOptions);
+          })
+        ),
+        this.feedbackApiService.getFeedback(id).pipe(
+          tap(feedback => {
+            console.log('Feedback received:', feedback);
+          })
+        )
+      ]).pipe(
+        map(([feedbackOptions, feedback]) => feedback)
       )
     ),
     shareReplay({ bufferSize: 1, refCount: false })
