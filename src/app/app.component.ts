@@ -275,3 +275,80 @@ initFeedbackStream(): Observable<HttpRequestState<Feedback[]>> {
     shareReplay({ bufferSize: 1, refCount: false })
   );
 }
+
+
+
+
+Copy code
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+@Component({
+  selector: 'app-your-component',
+  templateUrl: './your-component.component.html',
+  styleUrls: ['./your-component.component.css']
+})
+export class YourComponent implements OnInit {
+  myForm: FormGroup;
+  dropdownOptions: string[] = ['aa', 'bb', 'cc'];
+  file: File | null = null;
+  fileContent: ArrayBuffer | null = null;
+
+  constructor(private fb: FormBuilder, private http: HttpClient) {
+    this.myForm = this.fb.group({
+      dropdown: ['aa'], // Default value
+      textInput: ['']
+    });
+  }
+
+  ngOnInit(): void {}
+
+  async onFileChange(event: any) {
+    const files: FileList = event.target.files;
+    if (files.length === 0) {
+      return;
+    }
+
+    this.file = files[0];
+    this.fileContent = await this.readFileAsArrayBuffer(this.file);
+  }
+
+  private readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = error => reject(error);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  onSubmit() {
+    if (!this.file || !this.fileContent) {
+      console.error('File or file content is missing');
+      return;
+    }
+
+    const payload = {
+      fileName: this.file.name,
+      fileType: this.file.type,
+      dropdown: this.myForm.get('dropdown')?.value,
+      textInput: this.myForm.get('textInput')?.value
+    };
+
+    const blob = new Blob([this.fileContent], { type: this.file.type });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    this.http.post('YOUR_BACKEND_API_URL', {
+      payload,
+      file: blob
+    }, { headers }).subscribe(response => {
+      console.log('Upload successful', response);
+    }, error => {
+      console.error('Upload failed', error);
+    });
+  }
+}
