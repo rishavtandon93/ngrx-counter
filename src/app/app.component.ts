@@ -352,3 +352,27 @@ export class YourComponent implements OnInit {
     });
   }
 }
+
+
+
+transformData(templates: any): TreeNode[] {
+  const transformedData: TreeNode[] = [];
+
+  for (const [key, value] of Object.entries(templates)) {
+    const children = (value as any[]).map(item => ({
+      label: item.name,
+      key: `${item.name.toLowerCase()}_${item.disclaimer_key || 'null'}`,
+      data: { name: item.name, disclaimer_key: item.disclaimer_key }
+    }));
+
+    transformedData.push({
+      label: key.charAt(0).toUpperCase() + key.slice(1),
+      key: key.toLowerCase(),
+      selectable: false,
+      expanded: true,
+      children: children
+    });
+  }
+
+  return transformedData;
+}

@@ -45,30 +45,3 @@
 </div>
 </div>
 
-
-
-
-transformData(templates: any): any[] {
-  return [
-    {
-      label: 'External',
-      key: 'external',
-      selectable: false,
-      children: templates.external.map((item: any) => ({
-        label: item.name,
-        key: `${item.name.toLowerCase()}_${item.disclaimer_key}`,
-        data: { name: item.name, disclaimer_key: item.disclaimer_key }
-      }))
-    },
-    {
-      label: 'Internal',
-      key: 'internal',
-      selectable: false,
-      children: templates.internal.map((item: any) => ({
-        label: item.name,
-        key: item.name.toLowerCase(),
-        data: { name: item.name, disclaimer_key: item.disclaimer_key }
-      }))
-    }
-  ];
-}
