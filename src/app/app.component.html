@@ -5,3 +5,70 @@
     <div>
   </div>
 </div>
+
+
+
+<div class="w-full">
+<div style="flex: 0 0 90%" class="mb-4">
+  <cb-input></cb-input>
+</div>
+<div style="flex: 0 0 10%" class="flex flex-firection-column align-items-center justify-content-center mb-2 ml-2">
+  <form [formGroup]="uploadForm">
+    <div class="flex align-items-center justiy-content-start">
+      <div style="white-space: no-wrap" class="mr-2">
+        Date
+      </div>
+      <div class="w-full">
+        <p-calendar></p-calendar>
+      </div>
+    </div>
+    <div class="flex align-items-center justiy-content-start">
+      <div style="white-space: no-wrap" class="mr-2">
+        Contetnt
+      </div>
+      <div class="w-full">
+        <p-dropdown></p-dropdown>
+      </div>
+    </div>
+    <div class="flex align-items-center justiy-content-start">
+      <div style="white-space: no-wrap" class="mr-2">
+        Platform
+      </div>
+      <div class="w-full">
+        <p-multi></p-multi>
+      </div>
+    </div>
+    <div>
+      <button></button>
+    </div>
+  </form>
+</div>
+</div>
+
+
+
+
+transformData(templates: any): any[] {
+  return [
+    {
+      label: 'External',
+      key: 'external',
+      selectable: false,
+      children: templates.external.map((item: any) => ({
+        label: item.name,
+        key: `${item.name.toLowerCase()}_${item.disclaimer_key}`,
+        data: { name: item.name, disclaimer_key: item.disclaimer_key }
+      }))
+    },
+    {
+      label: 'Internal',
+      key: 'internal',
+      selectable: false,
+      children: templates.internal.map((item: any) => ({
+        label: item.name,
+        key: item.name.toLowerCase(),
+        data: { name: item.name, disclaimer_key: item.disclaimer_key }
+      }))
+    }
+  ];
+}
