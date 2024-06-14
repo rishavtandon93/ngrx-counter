@@ -376,3 +376,18 @@ transformData(templates: any): TreeNode[] {
 
   return transformedData;
 }
+
+
+transformData(templates: Templates): TreeNode[] {
+  return Object.entries(templates).map(([key, value]) => ({
+    label: key.charAt(0).toUpperCase() + key.slice(1),
+    key: key.toLowerCase(),
+    selectable: false,
+    expanded: true, // Expand the node by default
+    children: value.map((item: TemplateItem) => ({
+      label: item.name,
+      key: `${item.name.toLowerCase()}_${item.disclaimer_key || 'null'}`,
+      data: { name: item.name, disclaimer_key: item.disclaimer_key }
+    }))
+  }));
+}
