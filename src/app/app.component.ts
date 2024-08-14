@@ -20,30 +20,34 @@ getFeedbackBlotterSchema(): Observable<BlotterColumnDef[]> {
 
 
 showLatest() {
+  // Create an object to store the filter model for 'id' and 'site'
   const filterModel: IFilterModel = {};
 
-  // Get the unique sites from the data
-  const sites = [...new Set(this.rowData.map(item => item.site))];
+  // Group data by site and find the largest id for each site
+  const latestData = this.rowData.reduce((acc, curr) => {
+    const existing = acc.find(item => item.site === curr.site);
+    if (!existing || curr.id > existing.id) {
+      if (existing) {
+        acc = acc.filter(item => item.site !== curr.site); // Remove previous entry for the site
+      }
+      acc.push({ site: curr.site, id: curr.id });
+    }
+    return acc;
+  }, []);
 
-  // For each site, find the largest id and create a filter model
-  sites.forEach(site => {
-    const maxId = Math.max(
-      ...this.rowData.filter(item => item.site === site).map(item => item.id)
-    );
-    filterModel['id'] = {
-      type: 'equals',
-      filter: maxId,
-      filterType: 'number'
-    };
-    filterModel['site'] = {
-      type: 'equals',
-      filter: site,
-      filterType: 'text'
-    };
+  // Apply a set filter on 'id' and 'site' using the largest IDs and corresponding sites
+  filterModel['id'] = {
+    filterType: 'set',
+    values: latestData.map(item => item.id.toString()) // Convert ids to strings as required by the filter model
+  };
 
-    // Apply the filter model for each site
-    this.gridApi.setFilterModel(filterModel);
-  });
+  filterModel['site'] = {
+    filterType: 'set',
+    values: latestData.map(item => item.site)
+  };
 
+  // Apply the filter model to the grid
+  this.gridApi.setFilterModel(filterModel);
   this.gridApi.onFilterChanged();
 }
+
