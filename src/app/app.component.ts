@@ -18,9 +18,32 @@ getFeedbackBlotterSchema(): Observable<BlotterColumnDef[]> {
 }
 
 
-setDateFromString(inputString: string) {
-  const dateRegex = /\b(\d{4})-(\d{2})-(\d{2})\b/;
-  const match = inputString.match(dateRegex);
 
-  this.form.get('date')?.setValue(match ? DateTime.fromISO(match[0]).toJSDate() : null);
+showLatest() {
+  const filterModel: IFilterModel = {};
+
+  // Get the unique sites from the data
+  const sites = [...new Set(this.rowData.map(item => item.site))];
+
+  // For each site, find the largest id and create a filter model
+  sites.forEach(site => {
+    const maxId = Math.max(
+      ...this.rowData.filter(item => item.site === site).map(item => item.id)
+    );
+    filterModel['id'] = {
+      type: 'equals',
+      filter: maxId,
+      filterType: 'number'
+    };
+    filterModel['site'] = {
+      type: 'equals',
+      filter: site,
+      filterType: 'text'
+    };
+
+    // Apply the filter model for each site
+    this.gridApi.setFilterModel(filterModel);
+  });
+
+  this.gridApi.onFilterChanged();
 }
