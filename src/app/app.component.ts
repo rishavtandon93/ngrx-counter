@@ -1,49 +1,31 @@
-<div style="position: relative; min-height: 100vh;">
-  <!-- Button to open the sidebar -->
-  <button pButton type="button" icon="pi pi-table" (click)="showSidebar()" class="p-button-rounded p-button-outlined"
-    style="position: absolute; top: 10px; left: 10px;"></button>
-
-  <!-- Sidebar Component -->
-  <p-sidebar [(visible)]="visibleSidebar" [baseZIndex]="10000" position="left" styleClass="custom-sidebar">
-    <h3>Columns</h3>
-    <ul>
-      <li *ngFor="let item of columnItems">{{ item }}</li>
-    </ul>
-  </p-sidebar>
+<div class="vertical-div">
+  <button class="vertical-button">Grid</button>
 </div>
 
-visibleSidebar: boolean = false;
+.vertical-div {
+  width: 30px;
+  height: 100vh; /* 100% of the viewport height */
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  columnItems = ['Athlete', 'Age', 'Country', 'Year', 'Date', 'Gold', 'Silver', 'Bronze', 'Total'];
+/* Styling for the vertical button */
+.vertical-button {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
 
-  showSidebar() {
-    this.visibleSidebar = true;
-  }
-
-
-  .custom-sidebar {
-    width: 300px !important;
-    background-color: #2C3E50; /* Adjust the color based on the image */
-    color: #ecf0f1;
-  }
-
-  .custom-sidebar h3 {
-    margin-top: 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ecf0f1;
-  }
-
-  .custom-sidebar ul {
-    list-style: none;
-    padding: 0;
-  }
-
-  .custom-sidebar ul li {
-    padding: 10px;
-    border-bottom: 1px solid #34495e;
-    cursor: pointer;
-  }
-
-  .custom-sidebar ul li:hover {
-    background-color: #34495e;
-  }
+.vertical-button:hover {
+  background-color: #777;
+}
