@@ -1,41 +1,49 @@
+<div style="position: relative; min-height: 100vh;">
+  <!-- Button to open the sidebar -->
+  <button pButton type="button" icon="pi pi-table" (click)="showSidebar()" class="p-button-rounded p-button-outlined"
+    style="position: absolute; top: 10px; left: 10px;"></button>
 
-
-
-<p-sidebar [(visible)]="visibleSidebar" [fullScreen]="false" [baseZIndex]="10000" [style]="{'width':'300px'}" position="left" [blockScroll]="true">
-    <h1>Sidebar Content</h1>
-    <p>Place your content here.</p>
-</p-sidebar>
-
-<!-- Main content of the page -->
-<div class="main-content" [class.collapsed]="!visibleSidebar">
-    <h1>Main Content Area</h1>
-    <button (click)="toggleSidebar()">Toggle Sidebar</button>
-    <p>This is the main page content.</p>
+  <!-- Sidebar Component -->
+  <p-sidebar [(visible)]="visibleSidebar" [baseZIndex]="10000" position="left" styleClass="custom-sidebar">
+    <h3>Columns</h3>
+    <ul>
+      <li *ngFor="let item of columnItems">{{ item }}</li>
+    </ul>
+  </p-sidebar>
 </div>
 
+visibleSidebar: boolean = false;
 
-/* Full-height sidebar styling */
-p-sidebar {
-  height: 100vh; /* Full page height */
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
+  columnItems = ['Athlete', 'Age', 'Country', 'Year', 'Date', 'Gold', 'Silver', 'Bronze', 'Total'];
 
-/* Main content */
-.main-content {
-  margin-left: 0;
-  padding: 20px;
-  transition: all 0.3s ease;
-}
+  showSidebar() {
+    this.visibleSidebar = true;
+  }
 
-.main-content.collapsed {
-  margin-left: 300px; /* Adjust based on sidebar width */
-}
 
-/* Sidebar when collapsed */
-p-sidebar.collapsed {
-  width: 60px; /* Adjust width when collapsed */
-}
+  .custom-sidebar {
+    width: 300px !important;
+    background-color: #2C3E50; /* Adjust the color based on the image */
+    color: #ecf0f1;
+  }
+
+  .custom-sidebar h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ecf0f1;
+  }
+
+  .custom-sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .custom-sidebar ul li {
+    padding: 10px;
+    border-bottom: 1px solid #34495e;
+    cursor: pointer;
+  }
+
+  .custom-sidebar ul li:hover {
+    background-color: #34495e;
+  }
