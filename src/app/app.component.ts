@@ -1,31 +1,11 @@
-<div class="vertical-div">
-  <button class="vertical-button">Grid</button>
-</div>
+processIds() {
+  const inputString = this.idsControl.value;
 
-.vertical-div {
-  width: 30px;
-  height: 100vh; /* 100% of the viewport height */
-  position: fixed;
-  left: 0;
-  top: 0;
-  background-color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  // Split input string based on commas, spaces, or newlines
+  const idArray = inputString
+    .split(/[\s,]+/) // Regular expression to split by spaces, commas, or newlines
+    .filter(id => id.trim() !== ''); // Filter out empty strings
 
-/* Styling for the vertical button */
-.vertical-button {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  background-color: #555;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.vertical-button:hover {
-  background-color: #777;
+  console.log(idArray);
+  // You can now use this array for further processing
 }
