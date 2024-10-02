@@ -65,3 +65,45 @@ export class NumberCommaDirective {
     );
   }
 }
+
+import { Directive, ElementRef, HostListener, OnInit } from '@angular/core';
+import { NgControl } from '@angular/forms';
+
+@Directive({
+  selector: '[appNumberComma]',
+})
+export class NumberCommaDirective implements OnInit {
+  constructor(private el: ElementRef, private control: NgControl) {}
+
+  ngOnInit(): void {
+    const initialValue = this.control.control?.value;
+    if (initialValue) {
+      this.formatInputValue(initialValue);
+    }
+  }
+
+  @HostListener('input', ['$event'])
+  onInputChange(): void {
+    const inputValue = this.el.nativeElement.value.replace(/,/g, '');
+
+    if (!isNaN(Number(inputValue))) {
+      this.formatInputValue(inputValue);
+    }
+  }
+
+  @HostListener('blur')
+  onBlur(): void {
+    const inputValue = this.el.nativeElement.value.replace(/,/g, '');
+    this.formatInputValue(inputValue);
+  }
+
+  private formatInputValue(value: string): void {
+    const formattedValue = this.formatNumberWithCommas(value);
+    this.el.nativeElement.value = formattedValue;
+    this.control.control?.setValue(value);
+  }
+
+  private formatNumberWithCommas(value: string): string {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+}
