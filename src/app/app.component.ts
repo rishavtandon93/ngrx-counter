@@ -1,58 +1,36 @@
-import { Directive, ElementRef, HostListener, OnInit } from '@angular/core';
-import { NgControl } from '@angular/forms';
+import { Directive, ElementRef, HostListener } from '@angular/core';
 
 @Directive({
   selector: '[appNumberComma]',
 })
-export class NumberCommaDirective implements OnInit {
-  constructor(private el: ElementRef, private control: NgControl) {}
+export class NumberCommaDirective {
+  private el: HTMLInputElement;
 
-  ngOnInit(): void {
-    // Format initial value on form initialization if the value exists
-    const initialValue = this.control.control?.value;
-    if (initialValue) {
-      this.el.nativeElement.value = this.formatNumberWithCommas(initialValue);
+  constructor(private elementRef: ElementRef) {
+    this.el = this.elementRef.nativeElement;
+  }
+
+  @HostListener('input', ['$event']) onInputChange(event: any) {
+    const initalValue = this.el.value;
+
+    // Remove all non-numeric characters (except for period for decimals)
+    const cleanValue = initalValue.replace(/[^0-9\.]/g, '');
+
+    // Reformat the number with commas
+    this.el.value = this.formatNumberWithCommas(cleanValue);
+
+    // Set cursor back to the end of input after formatting
+    event.target.setSelectionRange(this.el.value.length, this.el.value.length);
+
+    // Prevent non-numeric characters from being set as input value
+    if (initalValue !== this.el.value) {
+      event.stopPropagation();
     }
   }
 
-  @HostListener('input', ['$event'])
-  onInputChange(event: any): void {
-    const input = this.el.nativeElement;
-
-    // Save current cursor position
-    let cursorPosition = input.selectionStart;
-
-    // Get the raw value (remove commas)
-    let numericValue = input.value.replace(/,/g, '');
-
-    // If the input is not a valid number, don't proceed
-    if (isNaN(Number(numericValue))) {
-      return;
-    }
-
-    // Save the previous length for cursor position adjustment
-    const previousLength = input.value.length;
-
-    // Format the value with commas
-    input.value = this.formatNumberWithCommas(numericValue);
-
-    // Update the form control value (without commas)
-    this.control.control?.setValue(numericValue);
-
-    // Adjust the cursor position based on the new formatted value
-    cursorPosition = cursorPosition + (input.value.length - previousLength);
-    input.setSelectionRange(cursorPosition, cursorPosition);
-  }
-
-  @HostListener('blur')
-  onBlur(): void {
-    const input = this.el.nativeElement;
-    // Ensure the value is formatted with commas when the input loses focus
-    input.value = this.formatNumberWithCommas(input.value.replace(/,/g, ''));
-  }
-
-  // Helper method to format numbers with commas
   private formatNumberWithCommas(value: string): string {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const parts = value.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
   }
 }
