@@ -1,16 +1,26 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, OnInit } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
   selector: '[appNumberComma]',
 })
-export class NumberCommaDirective {
+export class NumberCommaDirective implements OnInit {
   private previousValue: string = '';
 
   constructor(private el: ElementRef, private control: NgControl) {}
 
+  ngOnInit(): void {
+    // Format the initial value if the control has a prefilled value
+    const initialValue = this.control.control?.value;
+    if (initialValue && !isNaN(Number(initialValue))) {
+      // Format the value with commas and update the view
+      const formattedValue = this.formatNumberWithCommas(initialValue);
+      this.el.nativeElement.value = formattedValue;
+    }
+  }
+
   @HostListener('input', ['$event'])
-  onInputChange(event: any): void {
+  onInputChange(): void {
     const input = this.el.nativeElement;
 
     // Get the raw value of the input (remove commas)
@@ -39,7 +49,7 @@ export class NumberCommaDirective {
   }
 
   @HostListener('blur', ['$event'])
-  onBlur(event: any): void {
+  onBlur(): void {
     // When the input loses focus, ensure the value is correctly formatted
     const input = this.el.nativeElement;
     input.value = this.formatNumberWithCommas(input.value.replace(/,/g, ''));
@@ -63,47 +73,5 @@ export class NumberCommaDirective {
       cursorPosition + lengthDifference,
       cursorPosition + lengthDifference
     );
-  }
-}
-
-import { Directive, ElementRef, HostListener, OnInit } from '@angular/core';
-import { NgControl } from '@angular/forms';
-
-@Directive({
-  selector: '[appNumberComma]',
-})
-export class NumberCommaDirective implements OnInit {
-  constructor(private el: ElementRef, private control: NgControl) {}
-
-  ngOnInit(): void {
-    const initialValue = this.control.control?.value;
-    if (initialValue) {
-      this.formatInputValue(initialValue);
-    }
-  }
-
-  @HostListener('input', ['$event'])
-  onInputChange(): void {
-    const inputValue = this.el.nativeElement.value.replace(/,/g, '');
-
-    if (!isNaN(Number(inputValue))) {
-      this.formatInputValue(inputValue);
-    }
-  }
-
-  @HostListener('blur')
-  onBlur(): void {
-    const inputValue = this.el.nativeElement.value.replace(/,/g, '');
-    this.formatInputValue(inputValue);
-  }
-
-  private formatInputValue(value: string): void {
-    const formattedValue = this.formatNumberWithCommas(value);
-    this.el.nativeElement.value = formattedValue;
-    this.control.control?.setValue(value);
-  }
-
-  private formatNumberWithCommas(value: string): string {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 }
