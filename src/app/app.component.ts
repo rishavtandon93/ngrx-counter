@@ -5,7 +5,7 @@ import { NgControl } from '@angular/forms';
   selector: '[appNumberComma]',
 })
 export class NumberCommaDirective {
-  private lastCursorPosition: number = 0;
+  private previousValue: string = '';
 
   constructor(private el: ElementRef, private control: NgControl) {}
 
@@ -13,49 +13,55 @@ export class NumberCommaDirective {
   onInputChange(event: any): void {
     const input = this.el.nativeElement;
 
-    // Get the position of the cursor before formatting
-    const cursorPosition = input.selectionStart;
-    const originalValue = input.value;
+    // Get the raw value of the input (remove commas)
+    let numericValue = input.value.replace(/,/g, '');
 
-    // Remove commas
-    let numericValue = originalValue.replace(/,/g, '');
-
-    // Set the new raw numeric value to the form control
-    this.control.control?.setValue(numericValue);
-
-    if (!isNaN(Number(numericValue)) && numericValue !== '') {
-      // Format the number with commas
-      input.value = this.formatNumberWithCommas(numericValue);
+    // Prevent any non-numeric input (except backspace and delete)
+    if (isNaN(Number(numericValue))) {
+      input.value = this.previousValue;
+      return;
     }
 
-    // Adjust the cursor position after reformatting
-    this.adjustCursorPosition(cursorPosition, originalValue, input);
+    // Save the position of the cursor before formatting
+    const cursorPosition = input.selectionStart;
+
+    // Store the previous value for comparison
+    this.previousValue = numericValue;
+
+    // Format the numeric value with commas
+    input.value = this.formatNumberWithCommas(numericValue);
+
+    // Update the form control with the numeric value (without commas)
+    this.control.control?.setValue(numericValue);
+
+    // Adjust the cursor position based on comma formatting
+    this.adjustCursorPosition(cursorPosition, numericValue.length, input);
   }
 
   @HostListener('blur', ['$event'])
   onBlur(event: any): void {
-    // Ensure the input is formatted properly when the input field loses focus
+    // When the input loses focus, ensure the value is correctly formatted
     const input = this.el.nativeElement;
     input.value = this.formatNumberWithCommas(input.value.replace(/,/g, ''));
   }
 
   private formatNumberWithCommas(value: string): string {
+    // Add commas for every 3 digits
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
-  // Function to adjust the cursor position after formatting
   private adjustCursorPosition(
     cursorPosition: number,
-    originalValue: string,
+    unformattedLength: number,
     input: HTMLInputElement
   ): void {
-    const newFormattedValue = input.value;
-    const lengthDiff = newFormattedValue.length - originalValue.length;
+    const formattedValueLength = input.value.length;
+    const lengthDifference = formattedValueLength - unformattedLength;
 
-    // Set the new cursor position, adjusting for the difference caused by adding commas
+    // Adjust the cursor position after formatting
     input.setSelectionRange(
-      cursorPosition + lengthDiff,
-      cursorPosition + lengthDiff
+      cursorPosition + lengthDifference,
+      cursorPosition + lengthDifference
     );
   }
 }
