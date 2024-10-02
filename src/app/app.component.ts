@@ -1,29 +1,43 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+Copy code
+import { Directive, ElementRef, HostListener, OnInit } from '@angular/core';
 
 @Directive({
-  selector: '[appNumberComma]',
+  selector: '[appNumberComma]'
 })
-export class NumberCommaDirective {
+export class NumberCommaDirective implements OnInit {
+
   private el: HTMLInputElement;
 
   constructor(private elementRef: ElementRef) {
     this.el = this.elementRef.nativeElement;
   }
 
-  @HostListener('input', ['$event']) onInputChange(event: any) {
-    const initalValue = this.el.value;
+  ngOnInit() {
+    // If the input has an initial value, format it with commas on initialization
+    if (this.el.value) {
+      this.el.value = this.formatNumberWithCommas(this.el.value.replace(/[^0-9\.]/g, ''));
+    }
+  }
 
-    // Remove all non-numeric characters (except for period for decimals)
-    const cleanValue = initalValue.replace(/[^0-9\.]/g, '');
+  @HostListener('input', ['$event']) onInputChange(event: any) {
+    const start = this.el.selectionStart;
+    const end = this.el.selectionEnd;
+
+    const initialValue = this.el.value;
+
+    // Remove all non-numeric characters except for periods (for decimals)
+    const cleanValue = initialValue.replace(/[^0-9\.]/g, '');
 
     // Reformat the number with commas
     this.el.value = this.formatNumberWithCommas(cleanValue);
 
-    // Set cursor back to the end of input after formatting
-    event.target.setSelectionRange(this.el.value.length, this.el.value.length);
+    // Adjust the cursor position based on the changes in the string length
+    const newStart = start + (this.el.value.length - initialValue.length);
+
+    event.target.setSelectionRange(newStart, newStart);
 
     // Prevent non-numeric characters from being set as input value
-    if (initalValue !== this.el.value) {
+    if (initialValue !== this.el.value) {
       event.stopPropagation();
     }
   }
