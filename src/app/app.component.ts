@@ -1,50 +1,59 @@
-Copy code
-import { Directive, ElementRef, HostListener, OnInit } from '@angular/core';
+<div class="container">
+  <!-- First horizontal div (split into three vertically) -->
+  <div class="left-section">
+    <div class="red-box">Red</div>
+    <div class="green-box">Green</div>
+    <div class="blue-box">Blue</div>
+  </div>
 
-@Directive({
-  selector: '[appNumberComma]'
-})
-export class NumberCommaDirective implements OnInit {
+  <!-- Second horizontal div -->
+  <div class="right-section">
+    <div class="white-box">White</div>
+  </div>
+</div>
 
-  private el: HTMLInputElement;
 
-  constructor(private elementRef: ElementRef) {
-    this.el = this.elementRef.nativeElement;
-  }
+.container {
+  display: flex;
+  height: 100vh; /* Full height of the viewport */
+}
 
-  ngOnInit() {
-    // If the input has an initial value, format it with commas on initialization
-    if (this.el.value) {
-      this.el.value = this.formatNumberWithCommas(this.el.value.replace(/[^0-9\.]/g, ''));
-    }
-  }
+/* Left Section: Split vertically into 3 */
+.left-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-  @HostListener('input', ['$event']) onInputChange(event: any) {
-    const start = this.el.selectionStart;
-    const end = this.el.selectionEnd;
+.red-box, .green-box, .blue-box {
+  flex-grow: 1;
+}
 
-    const initialValue = this.el.value;
+.red-box, .green-box {
+  flex-basis: 40%;
+}
 
-    // Remove all non-numeric characters except for periods (for decimals)
-    const cleanValue = initialValue.replace(/[^0-9\.]/g, '');
+.blue-box {
+  flex-basis: 20%;
+}
 
-    // Reformat the number with commas
-    this.el.value = this.formatNumberWithCommas(cleanValue);
+.red-box {
+  background-color: red;
+}
 
-    // Adjust the cursor position based on the changes in the string length
-    const newStart = start + (this.el.value.length - initialValue.length);
+.green-box {
+  background-color: green;
+}
 
-    event.target.setSelectionRange(newStart, newStart);
+.blue-box {
+  background-color: blue;
+}
 
-    // Prevent non-numeric characters from being set as input value
-    if (initialValue !== this.el.value) {
-      event.stopPropagation();
-    }
-  }
-
-  private formatNumberWithCommas(value: string): string {
-    const parts = value.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return parts.join('.');
-  }
+/* Right Section */
+.right-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
 }
