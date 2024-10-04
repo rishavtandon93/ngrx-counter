@@ -56,3 +56,21 @@ export function extractValues(obj: InputObject): Array<string | number> {
 const exampleObj: InputObject = { quoteId: 'abc def', solution: 2 };
 const result = extractValues(exampleObj);
 console.log(result);
+
+
+export function extractValues(obj: { quoteId: string, competitorSolution: string }): Array<string | number> {
+  // Regular expression checks for a comma or space followed by a non-whitespace character
+  const hasSeparatorWithValues = /[,\s]+\S+/;
+
+  // Check if quoteId contains a comma or space followed by a non-whitespace character
+  if (obj.quoteId && hasSeparatorWithValues.test(obj.quoteId)) {
+    return obj.quoteId.split(/[\s,]+/); // Split by space or comma
+  }
+  // Check if competitorSolution contains a comma or space followed by a non-whitespace character
+  if (obj.competitorSolution && hasSeparatorWithValues.test(obj.competitorSolution)) {
+    return obj.competitorSolution.split(/[\s,]+/); // Split by space or comma
+  }
+
+  // Return empty array if neither contains meaningful comma or space-separated values
+  return [];
+}
