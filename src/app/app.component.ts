@@ -62,13 +62,16 @@ export function extractValues(obj: { quoteId: string, competitorSolution: string
   // Regular expression checks for a comma or space followed by a non-whitespace character
   const hasSeparatorWithValues = /[,\s]+\S+/;
 
+  // Function to split and filter out empty strings
+  const splitAndFilter = (str: string) => str.split(/[\s,]+/).filter(Boolean);
+
   // Check if quoteId contains a comma or space followed by a non-whitespace character
   if (obj.quoteId && hasSeparatorWithValues.test(obj.quoteId)) {
-    return obj.quoteId.split(/[\s,]+/); // Split by space or comma
+    return splitAndFilter(obj.quoteId); // Split by space or comma, filter out empty strings
   }
   // Check if competitorSolution contains a comma or space followed by a non-whitespace character
   if (obj.competitorSolution && hasSeparatorWithValues.test(obj.competitorSolution)) {
-    return obj.competitorSolution.split(/[\s,]+/); // Split by space or comma
+    return splitAndFilter(obj.competitorSolution); // Split by space or comma, filter out empty strings
   }
 
   // Return empty array if neither contains meaningful comma or space-separated values
