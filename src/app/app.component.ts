@@ -26,3 +26,33 @@ onCellPaste(event: any) {
     }
   }
 }
+
+
+export interface InputObject {
+  quoteId: string;
+  solution: string | number;
+}
+
+export function extractValues(obj: InputObject): Array<string | number> {
+  let result: Array<string | number> = [];
+
+  // Check if quoteId is a string and contains space or comma-separated values
+  if (typeof obj.quoteId === 'string' && (obj.quoteId.includes(' ') || obj.quoteId.includes(','))) {
+    result = obj.quoteId.split(/[\s,]+/); // Split by space or comma
+  }
+
+  // Check if solution is a string or number and contains space or comma-separated values
+  if (typeof obj.solution === 'string' || typeof obj.solution === 'number') {
+    let solutionStr = String(obj.solution); // Convert solution to string if it is a number
+    if (solutionStr.includes(' ') || solutionStr.includes(',')) {
+      result = solutionStr.split(/[\s,]+/).map(Number); // Split by space or comma and convert to numbers
+    }
+  }
+
+  return result;
+}
+
+// Example usage in Angular
+const exampleObj: InputObject = { quoteId: 'abc def', solution: 2 };
+const result = extractValues(exampleObj);
+console.log(result);
