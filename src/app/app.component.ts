@@ -92,3 +92,12 @@ onCellValueChanged(params: any) {
     params.api.applyTransaction({ add: [{}] });
   }
 }
+
+function onCellKeyPress(params: CellKeyPressEvent) {
+  if (params.event.key === "Delete" || params.event.key === "Del") {
+    const rowToDelete = params.node.data;
+
+    // Delete the row
+    params.api.applyTransaction({ remove: [rowToDelete] });
+  }
+}
