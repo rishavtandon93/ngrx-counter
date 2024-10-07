@@ -109,3 +109,38 @@ function onCellKeyPress(params: CellKeyPressEvent) {
     }
   }
 }
+
+import { GridOptions, CellValueChangedEvent } from 'ag-grid-community';
+
+let isButtonEnabled = false;
+
+function onCellValueChanged(params: CellValueChangedEvent) {
+  const allRowsHaveValues = checkAllCellsHaveValues(params.api);
+  setButtonState(allRowsHaveValues);
+}
+
+function checkAllCellsHaveValues(api: GridOptions['api']): boolean {
+  const rowCount = api!.getDisplayedRowCount();
+
+  for (let i = 0; i < rowCount; i++) {
+    const rowNode = api!.getDisplayedRowAtIndex(i);
+    const rowData = rowNode?.data;
+
+    // Check if either quoteId or competitorSolution is empty or null
+    if (!rowData || rowData.quoteId == null || rowData.quoteId === "" ||
+        rowData.competitorSolution == null || rowData.competitorSolution === "") {
+      return false; // Return false immediately if any cell is empty or null
+    }
+  }
+
+  return true; // All cells have values
+}
+
+function setButtonState(isEnabled: boolean) {
+  const runButton = document.getElementById("runButton") as HTMLButtonElement;
+  if (runButton) {
+    runButton.disabled = !isEnabled;
+    isButtonEnabled = isEnabled;
+  }
+}
+
