@@ -95,9 +95,17 @@ onCellValueChanged(params: any) {
 
 function onCellKeyPress(params: CellKeyPressEvent) {
   if (params.event.key === "Delete" || params.event.key === "Del") {
-    const rowToDelete = params.node.data;
+    const lastRowIndex = params.api.getDisplayedRowCount() - 1;
+    const isLastRow = params.node.rowIndex === lastRowIndex;
+    const rowData = params.node.data;
 
-    // Delete the row
-    params.api.applyTransaction({ remove: [rowToDelete] });
+    const isRowEmpty =
+      rowData.quoteID === "" || rowData.quoteID == null &&
+      rowData.solution === "" || rowData.solution == null;
+
+    // Delete the row if it's not the last row, or if it's the last row and has data in at least one column
+    if (!isLastRow || !isRowEmpty) {
+      params.api.applyTransaction({ remove: [rowData] });
+    }
   }
 }
