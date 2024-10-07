@@ -77,3 +77,18 @@ export function extractValues(obj: { quoteId: string, competitorSolution: string
   // Return empty array if neither contains meaningful comma or space-separated values
   return [];
 }
+
+
+onCellValueChanged(params: any) {
+  const lastIndex = params.api.getDisplayedRowCount() - 1;
+  const lastRowNode = params.api.getDisplayedRowAtIndex(lastIndex);
+
+  // Check if the last row has values in both 'quoteID' and 'solution'
+  const hasQuoteID = lastRowNode?.data?.quoteID;
+  const hasSolution = lastRowNode?.data?.solution;
+
+  if (hasQuoteID && hasSolution) {
+    // Add a new blank row at the end
+    params.api.applyTransaction({ add: [{}] });
+  }
+}
