@@ -144,3 +144,70 @@ function setButtonState(isEnabled: boolean) {
   }
 }
 
+
+Copy code
+import { Component } from '@angular/core';
+import { ColDef, GridOptions } from 'ag-grid-community';
+
+@Component({
+  selector: 'app-my-grid',
+  template: `<ag-grid-angular
+                style="width: 100%; height: 500px;"
+                class="ag-theme-alpine"
+                [rowData]="rowData"
+                [columnDefs]="columnDefs"
+                [gridOptions]="gridOptions">
+             </ag-grid-angular>`,
+  styleUrls: ['./my-grid.component.css']
+})
+export class MyGridComponent {
+  rowData = [
+    { quoteId: '', competitorSolution: '' },
+    { quoteId: '', competitorSolution: '' },
+    // Add initial row data if needed
+  ];
+
+  columnDefs: ColDef[] = [
+    {
+      headerName: 'Quote ID',
+      field: 'quoteId',
+      editable: true,
+      cellClassRules: {
+        'error-cell': (params) => this.isDuplicateQuoteId(params),
+      },
+      onCellValueChanged: () => this.onQuoteIdChange(),
+    },
+    {
+      headerName: 'Competitor Solution',
+      field: 'competitorSolution',
+      editable: true,
+    },
+  ];
+
+  gridOptions: GridOptions = {
+    defaultColDef: {
+      resizable: true,
+      sortable: true,
+    },
+  };
+
+  // Checks if the quote ID is duplicated
+  isDuplicateQuoteId(params: any): boolean {
+    const quoteId = params.data.quoteId;
+    let isDuplicate = false;
+
+    // Iterate over all rows to check for duplicates
+    params.api.forEachNode((rowNode: any) => {
+      if (rowNode.data.quoteId === quoteId && rowNode !== params.node) {
+        isDuplicate = true;
+      }
+    });
+
+    return isDuplicate;
+  }
+
+  // Redraw rows to apply conditional formatting
+  onQuoteIdChange(): void {
+    this.gridOptions.api?.redrawRows();
+  }
+}
