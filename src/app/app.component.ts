@@ -213,16 +213,13 @@ export class MyGridComponent {
 }
 
 function formatString(input: string): string {
-  // Match groups where there is a single lowercase letter after an uppercase one
-  const regex = /[A-Z][a-z]?/g;
-  const matches = input.match(regex);
+  // Split the string at uppercase letters
+  const parts = input.match(/[A-Z][a-z]*|[a-z]+/g);
 
-  // If every match is an uppercase letter followed by a single lowercase letter
-  const hasSingleLetterAfterCapital = matches && matches.every(match => match.length <= 2);
+  if (!parts) return input;
 
-  if (hasSingleLetterAfterCapital) {
-      return matches.join(' ');
-  } else {
-      return _.startCase(input);
-  }
+  // Map each part based on its length and apply formatting
+  const formattedParts = parts.map(part => part.length === 2 ? part.toUpperCase() : _.startCase(part));
+
+  return formattedParts.join(' ');
 }
