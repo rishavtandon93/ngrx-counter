@@ -211,3 +211,18 @@ export class MyGridComponent {
     this.gridOptions.api?.redrawRows();
   }
 }
+
+function formatString(input: string): string {
+  // Match groups where there is a single lowercase letter after an uppercase one
+  const regex = /[A-Z][a-z]?/g;
+  const matches = input.match(regex);
+
+  // If every match is an uppercase letter followed by a single lowercase letter
+  const hasSingleLetterAfterCapital = matches && matches.every(match => match.length <= 2);
+
+  if (hasSingleLetterAfterCapital) {
+      return matches.join(' ');
+  } else {
+      return _.startCase(input);
+  }
+}
