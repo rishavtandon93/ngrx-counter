@@ -191,35 +191,16 @@ export class MyGridComponent {
     },
   };
 
-  // Checks if the quote ID is duplicated
-  isDuplicateQuoteId(params: any): boolean {
-    const quoteId = params.data.quoteId;
-    let isDuplicate = false;
+  isDuplicate(params) {
+    const currentRowIndex = params.node.rowIndex;
+    const quoteIdValue = params.value;
 
-    // Iterate over all rows to check for duplicates
-    params.api.forEachNode((rowNode: any) => {
-      if (rowNode.data.quoteId === quoteId && rowNode !== params.node) {
-        isDuplicate = true;
+    // Loop through all rows above the current row and check for duplicate values
+    for (let i = 0; i < currentRowIndex; i++) {
+      const rowNode = params.api.getDisplayedRowAtIndex(i);
+      if (rowNode && rowNode.data.quoteId === quoteIdValue) {
+        return true;
       }
-    });
-
-    return isDuplicate;
+    }
+    return false;
   }
-
-  // Redraw rows to apply conditional formatting
-  onQuoteIdChange(): void {
-    this.gridOptions.api?.redrawRows();
-  }
-}
-
-function formatString(input: string): string {
-  // Split the string at uppercase letters
-  const parts = input.match(/[A-Z][a-z]*|[a-z]+/g);
-
-  if (!parts) return input;
-
-  // Map each part based on its length and apply formatting
-  const formattedParts = parts.map(part => part.length === 2 ? part.toUpperCase() : _.startCase(part));
-
-  return formattedParts.join(' ');
-}
