@@ -204,3 +204,23 @@ export class MyGridComponent {
     }
     return false;
   }
+
+
+  checkUniqueQuoteId(): boolean {
+    const quoteIdSet = new Set<string>(); // Set to store unique quoteIds
+    let isUnique = true;
+
+    this.gridApi.forEachNode((node) => {
+        const quoteId = node.data.quoteId; // Access quoteId value
+
+        if (quoteIdSet.has(quoteId)) {
+            // If quoteId already exists in the Set, we have a duplicate
+            isUnique = false;
+        } else {
+            // Otherwise, add the quoteId to the Set
+            quoteIdSet.add(quoteId);
+        }
+    });
+
+    return isUnique; // Return true if all are unique, false if any duplicates
+}
