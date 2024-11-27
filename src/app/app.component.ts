@@ -1,14 +1,16 @@
-function transformAttribution(): Observable<any> {
-  return calculateAttribution().pipe(
-    map((data) => {
-      if (data.Result && data.Result.Rows.length > 0) {
-        const firstRow = data.Result.Rows[0];
-        return Object.keys(firstRow).map((key) => ({
-          field: key,
-          headerName: key,
-        }));
-      }
-      return []; // Return an empty array if Result or Rows is not present
-    })
-  );
-}
+const createTransaction = (key: keyof typeof AttributionResult) => {
+  const row = data?.[key]?.['Rows']?.[0];
+  if (row) {
+    return { ...row, type: key };
+  }
+  return null;
+};
+
+const transactions = [
+  createTransaction(AttributionResult.Result),
+  createTransaction(AttributionResult.ResultRawPrice),
+].filter(Boolean); // Filter out null values
+
+transactions.forEach((transaction) => {
+  this.gridApi.applyTransaction({ add: [transaction] });
+});
