@@ -1,13 +1,6 @@
-const order = ['type', 'Quote_Id', 'Product_Description'];
+const desiredOrder = ['type', 'Quote_Id', 'Product_Description'];
 
-const reorderedColumns = [
-  // First, sort and include the fields specified in the custom order
-  ...order
-    .map((field) => columns.find((col) => col.field === field))
-    .filter(Boolean), // Remove any undefined values (if fields in `order` are not in `columns`)
-
-  // Then, include all other fields that are not in the custom order
-  ...columns.filter((col) => !order.includes(col.field)),
+const reorderedColDef = [
+  ...desiredOrder.map((field) => colDef.find((col) => col.field === field)), // Add the desired fields in order
+  ...colDef.filter((col) => !desiredOrder.includes(col.field)), // Add the remaining fields in original order
 ];
-
-console.log(reorderedColumns);
