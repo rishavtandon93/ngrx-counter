@@ -1,12 +1,24 @@
-this.attributionService.calculateAttribution().subscribe((data: unknown) => {
-  // Use Object.entries to dynamically process each key in AttributionResult
-  const transactions = Object.entries(AttributionResult)
-    .map(([key, value]) => {
-      const row = data?.[value]?.['Rows']?.[0];
-      return row ? { ...row, type: value } : null; // Add type if row exists
-    })
-    .filter(Boolean); // Filter out null values
+onQuoteGridCellKeyDown = (cellDownEvent: CellKeyDownEvent): void => {
+  const keyboardEvent = cellDownEvent.event as KeyboardEvent;
 
-  // Apply all transactions in a single call
-  this.gridApi.applyTransaction({ add: transactions });
-});
+  if (keyboardEvent.key === 'Delete' || keyboardEvent.key === 'Del') {
+    const selectedNodes = cellDownEvent.api.getSelectedNodes();
+    const lastRowIndex = cellDownEvent.api.getDisplayedRowCount() - 1;
+
+    // Collect all rows to be deleted
+    const rowsToRemove = selectedNodes.map((node) => node.data);
+
+    // Check if any selected node is the last row
+    const isLastRowSelected = selectedNodes.some(
+      (node) => node.rowIndex === lastRowIndex
+    );
+
+    // If last row is not selected, remove the rows
+    if (!isLastRowSelected) {
+      cellDownEvent.api.applyTransaction({ remove: rowsToRemove });
+    }
+
+    // Clear selection to avoid issues after deleting rows
+    cellDownEvent.api.deselectAll();
+  }
+};
