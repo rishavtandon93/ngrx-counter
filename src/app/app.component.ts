@@ -1,6 +1,12 @@
-const desiredOrder = ['type', 'Quote_Id', 'Product_Description'];
+this.attributionService.calculateAttribution().subscribe((data: unknown) => {
+  // Use Object.entries to dynamically process each key in AttributionResult
+  const transactions = Object.entries(AttributionResult)
+    .map(([key, value]) => {
+      const row = data?.[value]?.['Rows']?.[0];
+      return row ? { ...row, type: value } : null; // Add type if row exists
+    })
+    .filter(Boolean); // Filter out null values
 
-const reorderedColDef = [
-  ...desiredOrder.map((field) => colDef.find((col) => col.field === field)), // Add the desired fields in order
-  ...colDef.filter((col) => !desiredOrder.includes(col.field)), // Add the remaining fields in original order
-];
+  // Apply all transactions in a single call
+  this.gridApi.applyTransaction({ add: transactions });
+});
