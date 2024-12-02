@@ -2,23 +2,38 @@ onQuoteGridCellKeyDown = (cellDownEvent: CellKeyDownEvent): void => {
   const keyboardEvent = cellDownEvent.event as KeyboardEvent;
 
   if (keyboardEvent.key === 'Delete' || keyboardEvent.key === 'Del') {
-    const selectedNodes = cellDownEvent.api.getSelectedNodes();
-    const lastRowIndex = cellDownEvent.api.getDisplayedRowCount() - 1;
+    const api = cellDownEvent.api;
 
-    // Collect all rows to be deleted
-    const rowsToRemove = selectedNodes.map((node) => node.data);
+    // Get all selected cells
+    const selectedCells = api.getCellRanges();
+    let rowsToRemove = new Set();
 
-    // Check if any selected node is the last row
-    const isLastRowSelected = selectedNodes.some(
-      (node) => node.rowIndex === lastRowIndex
-    );
-
-    // If last row is not selected, remove the rows
-    if (!isLastRowSelected) {
-      cellDownEvent.api.applyTransaction({ remove: rowsToRemove });
+    if (selectedCells && selectedCells.length > 0) {
+      // Collect all rows from selected cell ranges
+      selectedCells.forEach((range) => {
+        for (
+          let rowIndex = range.startRow.rowIndex;
+          rowIndex <= range.endRow.rowIndex;
+          rowIndex++
+        ) {
+          const node = api.getDisplayedRowAtIndex(rowIndex);
+          if (node && node.data) {
+            rowsToRemove.add(node.data);
+          }
+        }
+      });
+    } else {
+      // If no range is selected, remove the row of the current cell
+      const currentNode = cellDownEvent.node;
+      if (currentNode && currentNode.data) {
+        rowsToRemove.add(currentNode.data);
+      }
     }
 
-    // Clear selection to avoid issues after deleting rows
-    cellDownEvent.api.deselectAll();
+    // Convert Set to Array and remove rows
+    rowsToRemove = Array.from(rowsToRemove);
+    if (rowsToRemove.length > 0) {
+      api.applyTransaction({ remove: rowsToRemove });
+    }
   }
 };
