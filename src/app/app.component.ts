@@ -1,39 +1,52 @@
-onQuoteGridCellKeyDown = (cellDownEvent: CellKeyDownEvent): void => {
-  const keyboardEvent = cellDownEvent.event as KeyboardEvent;
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
-  if (keyboardEvent.key === 'Delete' || keyboardEvent.key === 'Del') {
-    const api = cellDownEvent.api;
+@Injectable({
+  providedIn: 'root',
+})
+export class SseService implements OnDestroy {
+  private eventSource: EventSource | null = null;
+  private eventSubject: Subject<string> = new Subject<string>();
 
-    // Get all selected cells
-    const selectedCells = api.getCellRanges();
-    let rowsToRemove = new Set();
+  constructor() {}
 
-    if (selectedCells && selectedCells.length > 0) {
-      // Collect all rows from selected cell ranges
-      selectedCells.forEach((range) => {
-        for (
-          let rowIndex = range.startRow.rowIndex;
-          rowIndex <= range.endRow.rowIndex;
-          rowIndex++
-        ) {
-          const node = api.getDisplayedRowAtIndex(rowIndex);
-          if (node && node.data) {
-            rowsToRemove.add(node.data);
-          }
-        }
-      });
-    } else {
-      // If no range is selected, remove the row of the current cell
-      const currentNode = cellDownEvent.node;
-      if (currentNode && currentNode.data) {
-        rowsToRemove.add(currentNode.data);
-      }
+  /**
+   * Open connection to the SSE URL
+   * @param url - The SSE URL
+   * @returns Observable emitting SSE data
+   */
+  connect(url: string): Observable<string> {
+    if (this.eventSource) {
+      console.warn('Connection already open!');
+      return this.eventSubject.asObservable();
     }
 
-    // Convert Set to Array and remove rows
-    rowsToRemove = Array.from(rowsToRemove);
-    if (rowsToRemove.length > 0) {
-      api.applyTransaction({ remove: rowsToRemove });
+    this.eventSource = new EventSource(url);
+
+    this.eventSource.onmessage = (event: MessageEvent) => {
+      this.eventSubject.next(event.data); // Emit the event data
+    };
+
+    this.eventSource.onerror = () => {
+      console.error('SSE connection error');
+      this.disconnect();
+    };
+
+    return this.eventSubject.asObservable();
+  }
+
+  /**
+   * Close the SSE connection
+   */
+  disconnect(): void {
+    if (this.eventSource) {
+      this.eventSource.close();
+      this.eventSource = null;
+      this.eventSubject.complete();
     }
   }
-};
+
+  ngOnDestroy(): void {
+    this.disconnect();
+  }
+}
